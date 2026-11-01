@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/RM.AutoClicker.Core/RM.AutoClicker.Core.csproj" />
+    <Project Path="src/RM.AutoClicker.Platform.Windows/RM.AutoClicker.Platform.Windows.csproj" />
+    <Project Path="src/RM.AutoClicker.Desktop/RM.AutoClicker.Desktop.csproj">
+      <Platform Solution="*|*" Project="x64" />
+    </Project>
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/RM.AutoClicker.Core.Tests/RM.AutoClicker.Core.Tests.csproj" />
+    <Project Path="tests/RM.AutoClicker.Desktop.Tests/RM.AutoClicker.Desktop.Tests.csproj" />
+    <Project Path="tests/RM.AutoClicker.Platform.Windows.Tests/RM.AutoClicker.Platform.Windows.Tests.csproj" />
+  </Folder>
+</Solution>

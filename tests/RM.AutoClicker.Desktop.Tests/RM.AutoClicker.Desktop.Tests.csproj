@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsTestProject>true</IsTestProject>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" />
+    <ProjectReference Include="../../src/RM.AutoClicker.Core/RM.AutoClicker.Core.csproj" />
+    <Compile Include="../../src/RM.AutoClicker.Desktop/ViewModels/MainViewModel.cs" Link="Source/MainViewModel.cs" />
+    <Compile Include="../../src/RM.AutoClicker.Desktop/AppDiagnostics.cs" Link="Source/AppDiagnostics.cs" />
+    <Compile Include="../../src/RM.AutoClicker.Desktop/SmokeInputEmitter.cs" Link="Source/SmokeInputEmitter.cs" />
+    <Compile Include="../../src/RM.AutoClicker.Desktop/Localization/AppStrings.cs" Link="Source/AppStrings.cs" />
+    <Compile Include="../Shared/TestStrings.cs" Link="TestStrings.cs" />
+    <Content Include="../../src/RM.AutoClicker.Desktop/Strings/**/*.resw" Link="Strings/%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../../src/RM.AutoClicker.Desktop/MainWindow.xaml" Link="MainWindow.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <Using Include="Xunit" />
+  </ItemGroup>
+</Project>

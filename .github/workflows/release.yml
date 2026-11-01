@@ -1,0 +1,56 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Validate and build release
+    uses: ./.github/workflows/ci.yml
+    with:
+      release-tag: ${{ github.ref_name }}
+  publish:
+    name: Publish GitHub Release
+    needs: build
+    runs-on: windows-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Validate build identity
+        shell: pwsh
+        env:
+          BUILD_COMMIT: ${{ needs.build.outputs.commit-sha }}
+          PACKAGE_SHA256: ${{ needs.build.outputs.package-sha256 }}
+        run: |
+          if ($env:BUILD_COMMIT -notmatch '^[0-9a-f]{40}$' -or $env:PACKAGE_SHA256 -notmatch '^[0-9a-f]{64}$') {
+            throw 'CI did not provide a valid commit SHA and package hash.'
+          }
+      - name: Checkout release scripts
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ needs.build.outputs.commit-sha }}
+          persist-credentials: false
+      - name: Download the package built by CI
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          name: ${{ needs.build.outputs.artifact-name }}
+          path: artifacts/release-package
+      - name: Verify package and publish
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          BUILD_COMMIT: ${{ needs.build.outputs.commit-sha }}
+          PACKAGE_SHA256: ${{ needs.build.outputs.package-sha256 }}
+        run: |
+          ./scripts/Publish-Release.ps1 -Tag $env:RELEASE_TAG -Directory artifacts/release-package -ExpectedCommit $env:BUILD_COMMIT -ExpectedSHA256 $env:PACKAGE_SHA256 -Repository $env:GH_REPO
