@@ -28,8 +28,8 @@
                     </VisualState>
                 </VisualStateGroup>
             </VisualStateManager.VisualStateGroups>
-        <Grid x:Name="Layout" Padding="16" RowSpacing="4" MaxWidth="880" HorizontalAlignment="Stretch">
-            <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+        <Grid x:Name="Layout" Padding="16" RowSpacing="4" MaxWidth="880" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+            <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
             <StackPanel x:Name="SessionHeader" Spacing="8">
                 <Grid ColumnSpacing="12">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
@@ -127,7 +127,7 @@
                     </StackPanel>
                 </Border>
 
-                <Expander x:Uid="Advanced" x:Name="AdvancedOptions" IsExpanded="False" Expanding="OnAdvancedExpanding" SizeChanged="OnAdvancedSizeChanged" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                <Expander x:Uid="Advanced" x:Name="AdvancedOptions" IsExpanded="False" Expanding="OnAdvancedExpanding" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
                     <Expander.Header><StackPanel Spacing="4"><TextBlock x:Uid="AdvancedTitle" Style="{ThemeResource BodyStrongTextBlockStyle}" /><TextBlock Text="{x:Bind ViewModel.AdvancedSummary, Mode=OneWay}" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}" /></StackPanel></Expander.Header>
                     <StackPanel Spacing="20">
                         <StackPanel Spacing="8">

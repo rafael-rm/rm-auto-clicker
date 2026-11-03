@@ -37,8 +37,10 @@ public sealed partial class MainWindow : Window
     private bool _hotkeyActivationPending;
     private readonly List<object> _responsiveChecks = [];
     private object? _advancedRevealCheck;
+    private object? _windowSizingCheck;
     private object? _numericPopupDismissalCheck;
     private bool _advancedRevealPending;
+    private int _advancedRevealVersion;
 
     public MainWindow(IAppStrings strings, ISettingsStore settings, SettingsLoadResult loadedSettings,
         bool smokeTest = false, bool testIntegration = false)
@@ -64,14 +66,15 @@ public sealed partial class MainWindow : Window
         var numberRegion = new RegionInfo(numberCulture).TwoLetterISORegionName;
         foreach (var input in new[] { SpeedInput, DelayInput, ClickLimitInput, DurationInput, VariationInput })
             input.NumberFormatter = new Windows.Globalization.NumberFormatting.DecimalFormatter([numberCulture], numberRegion) { FractionDigits = 0 };
-        var scale = Root.XamlRoot?.RasterizationScale ?? 1;
+        ConfigureWindowBounds();
+        var scale = GetWindowScale();
         var workArea = DisplayArea.GetFromWindowId(AppWindow.Id, DisplayAreaFallback.Primary).WorkArea;
         AppWindow.Resize(new SizeInt32(Math.Min((int)(760 * scale), workArea.Width), Math.Min((int)(650 * scale), workArea.Height)));
-        if (AppWindow.Presenter is OverlappedPresenter presenter)
-        {
-            presenter.PreferredMinimumWidth = 400;
-            presenter.PreferredMinimumHeight = 600;
-        }
+        Root.Loaded += OnWindowLoaded;
+        Root.SizeChanged += OnLayoutSizeChanged;
+        SessionHeader.SizeChanged += OnLayoutSizeChanged;
+        OperationFooter.SizeChanged += OnLayoutSizeChanged;
+        AppWindow.Changed += OnWindowChanged;
         Root.RequestedTheme = (ElementTheme)ViewModel.ThemeIndex;
         ViewModel.ThemeChanged += theme => Root.RequestedTheme = (ElementTheme)theme;
         ViewModel.PropertyChanged += (_, args) =>
@@ -133,33 +136,133 @@ public sealed partial class MainWindow : Window
     public string NoticeTitle(bool isError) => isError ? _strings.Get("OperationUnavailable") : _strings.Get("Attention");
     public Style? PrimaryButtonStyle(bool emphasize) => emphasize ? (Style)Application.Current.Resources["AccentButtonStyle"] : null;
 
+    private void ConfigureWindowBounds()
+    {
+        if (_closing || AppWindow.Presenter is not OverlappedPresenter presenter)
+            return;
+
+        var scale = GetWindowScale();
+        var workArea = DisplayArea.GetFromWindowId(AppWindow.Id, DisplayAreaFallback.Primary).WorkArea;
+        var maximumWidth = Math.Max(1, Math.Min((int)(900 * scale), workArea.Width));
+        var maximumHeight = Math.Max(1, Math.Min((int)(900 * scale), workArea.Height));
+        var minimumWidth = Math.Min((int)(400 * scale), maximumWidth);
+        var minimumHeight = Math.Min((int)(600 * scale), maximumHeight);
+        presenter.IsMaximizable = false;
+        presenter.IsResizable = true;
+
+        if (presenter.PreferredMaximumWidth == maximumWidth && presenter.PreferredMaximumHeight == maximumHeight
+            && presenter.PreferredMinimumWidth == minimumWidth && presenter.PreferredMinimumHeight == minimumHeight)
+            return;
+
+        // Clear old minima before applying smaller limits on another display.
+        presenter.PreferredMinimumWidth = null;
+        presenter.PreferredMinimumHeight = null;
+        presenter.PreferredMaximumWidth = maximumWidth;
+        presenter.PreferredMaximumHeight = maximumHeight;
+        presenter.PreferredMinimumWidth = minimumWidth;
+        presenter.PreferredMinimumHeight = minimumHeight;
+
+        if (presenter.State != OverlappedPresenterState.Minimized)
+        {
+            var size = AppWindow.Size;
+            var width = Math.Clamp(size.Width, minimumWidth, maximumWidth);
+            var height = Math.Clamp(size.Height, minimumHeight, maximumHeight);
+            if (width != size.Width || height != size.Height)
+                AppWindow.Resize(new SizeInt32(width, height));
+        }
+    }
+
+    private double GetWindowScale() => Math.Max(96, GetDpiForWindow(WindowNativeHandle())) / 96.0;
+
+    private void OnWindowLoaded(object sender, RoutedEventArgs args)
+    {
+        Root.Loaded -= OnWindowLoaded;
+        Root.XamlRoot.Changed += (_, _) => ConfigureWindowBounds();
+        ConfigureWindowBounds();
+        UpdateSettingsViewport();
+    }
+
+    private void OnWindowChanged(AppWindow sender, AppWindowChangedEventArgs args)
+    {
+        if (args.DidPositionChange || args.DidPresenterChange)
+            ConfigureWindowBounds();
+    }
+
+    private void OnLayoutSizeChanged(object sender, SizeChangedEventArgs args) => UpdateSettingsViewport();
+
+    private void UpdateSettingsViewport()
+    {
+        if (_closing || Root.ActualHeight <= 0)
+            return;
+
+        var available = Math.Max(0, Root.ActualHeight - Layout.Padding.Top - Layout.Padding.Bottom
+            - SessionHeader.ActualHeight - OperationFooter.ActualHeight - 2 * Layout.RowSpacing);
+        if (Math.Abs(SettingsScroll.MaxHeight - available) > 0.5)
+            SettingsScroll.MaxHeight = available;
+    }
+
     private void OnAdvancedExpanding(Expander sender, ExpanderExpandingEventArgs args)
     {
         _advancedRevealPending = true;
-        RevealAdvancedOptions();
+        _ = RevealAdvancedOptionsAsync(++_advancedRevealVersion);
     }
 
-    private void OnAdvancedSizeChanged(object sender, SizeChangedEventArgs args)
+    private async Task RevealAdvancedOptionsAsync(int version)
     {
-        if (_advancedRevealPending)
-            RevealAdvancedOptions();
-    }
-
-    private void RevealAdvancedOptions()
-    {
-        DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
+        try
         {
-            if (_closing || !AdvancedOptions.IsExpanded || !_advancedRevealPending)
-                return;
-            Root.UpdateLayout();
-            InitialDelayToggle.StartBringIntoView(new BringIntoViewOptions
+            var deadline = Environment.TickCount64 + 2000;
+            long? stableSince = null;
+            var previousY = double.NaN;
+            var previousOffset = double.NaN;
+            var previousExtent = double.NaN;
+            while (Environment.TickCount64 < deadline)
             {
-                AnimationDesired = !_smokeTest,
-                VerticalAlignmentRatio = 0.5
-            });
-            if (IsInsideViewport(InitialDelayToggle, SettingsScroll))
+                await Task.Delay(40);
+                if (_closing || version != _advancedRevealVersion || !AdvancedOptions.IsExpanded)
+                    return;
+
+                Root.UpdateLayout();
+                if (InitialDelayToggle.ActualHeight <= 0 || SettingsScroll.ActualHeight <= 0)
+                    continue;
+
+                var position = InitialDelayToggle.TransformToVisual(SettingsScroll).TransformPoint(default);
+                var offset = SettingsScroll.VerticalOffset;
+                var extent = SettingsScroll.ExtentHeight;
+                var visible = IsInsideViewport(InitialDelayToggle, SettingsScroll);
+                // Expansion and scroll anchoring can update across several frames.
+                if (visible && Math.Abs(position.Y - previousY) < 0.5
+                    && Math.Abs(offset - previousOffset) < 0.5 && Math.Abs(extent - previousExtent) < 0.5)
+                {
+                    stableSince ??= Environment.TickCount64;
+                    if (Environment.TickCount64 - stableSince.Value >= 200)
+                        return;
+                }
+                else
+                {
+                    stableSince = null;
+                }
+
+                if (!visible)
+                {
+                    var target = offset + position.Y + InitialDelayToggle.ActualHeight / 2
+                        - SettingsScroll.ActualHeight / 2;
+                    SettingsScroll.ChangeView(null, Math.Clamp(target, 0, SettingsScroll.ScrollableHeight), null, true);
+                }
+                previousY = position.Y;
+                previousOffset = offset;
+                previousExtent = extent;
+            }
+        }
+        catch (Exception exception)
+        {
+            AppDiagnostics.Write("AdvancedOptionsRevealFailed", exception);
+        }
+        finally
+        {
+            if (version == _advancedRevealVersion)
                 _advancedRevealPending = false;
-        });
+        }
     }
 
     private void OnReviewValidation(object sender, RoutedEventArgs args)
@@ -183,6 +286,10 @@ public sealed partial class MainWindow : Window
     [DllImport("user32.dll", EntryPoint = "SendMessageW")]
     [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     private static extern nint SendMessage(nint window, uint message, nuint parameter, nint detail);
+
+    [DllImport("user32.dll")]
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+    private static extern uint GetDpiForWindow(nint window);
 
     private static HotkeyModifiers ReadHotkeyModifiers()
     {
@@ -369,6 +476,7 @@ public sealed partial class MainWindow : Window
             var numericInputEditingVerified = VerifyNumericInputEditing();
             var uncommittedNumericInputVerified = VerifyUncommittedNumericInput();
             var numericPopupDismissalVerified = await VerifyNumericPopupDismissalAsync();
+            var windowSizingVerified = await VerifyWindowSizingAsync();
             var advancedRevealVerified = await VerifyAdvancedRevealAsync();
             var responsiveLayoutVerified = await VerifyResponsiveLayoutAsync();
             var nativeModules = Process.GetCurrentProcess().Modules.Cast<ProcessModule>()
@@ -382,6 +490,8 @@ public sealed partial class MainWindow : Window
                 Restarted = restarted,
                 RestartRequired = ViewModel.LanguageChangePending,
                 InitialCompositionVerified = initialUnusedSpace <= 16,
+                WindowSizingVerified = windowSizingVerified,
+                WindowSizingCheck = _windowSizingCheck,
                 InitialUnusedSpace = initialUnusedSpace,
                 InitialActionsVisible = initialActionsVisible,
                 AdvancedRevealVerified = advancedRevealVerified,
@@ -434,6 +544,60 @@ public sealed partial class MainWindow : Window
         finally
         {
             await CloseAsync();
+        }
+    }
+
+    private async Task<bool> VerifyWindowSizingAsync()
+    {
+        var originalSize = AppWindow.Size;
+        try
+        {
+            if (AppWindow.Presenter is not OverlappedPresenter presenter
+                || presenter.PreferredMaximumWidth is not { } maximumWidth
+                || presenter.PreferredMaximumHeight is not { } maximumHeight)
+                return false;
+
+            AdvancedOptions.IsExpanded = false;
+            AppWindow.Resize(new SizeInt32(maximumWidth + 200, maximumHeight + 200));
+            await Task.Delay(180);
+            Root.UpdateLayout();
+            var boundedSize = AppWindow.Size;
+            FrameworkElement lastContent = SaveFeedbackText.Visibility == Visibility.Visible ? SaveFeedbackText : AdvancedOptions;
+            var contentBottom = lastContent.TransformToVisual(Root).TransformPoint(default).Y + lastContent.ActualHeight;
+            var collapsedFooter = OperationFooter.TransformToVisual(Root).TransformPoint(default).Y;
+            var collapsedGap = collapsedFooter - contentBottom;
+            var collapsedActionsVisible = AreSecondaryActionsVisible();
+
+            AdvancedOptions.IsExpanded = true;
+            await Task.Delay(350);
+            Root.UpdateLayout();
+            var expandedActionsVisible = AreSecondaryActionsVisible()
+                && OperationFooter.TransformToVisual(Root).TransformPoint(default).Y
+                    + OperationFooter.ActualHeight <= Root.ActualHeight + 1;
+
+            AdvancedOptions.IsExpanded = false;
+            await Task.Delay(350);
+            Root.UpdateLayout();
+            var restoredFooter = OperationFooter.TransformToVisual(Root).TransformPoint(default).Y;
+            _windowSizingCheck = new { MaximumWidth = maximumWidth, MaximumHeight = maximumHeight,
+                RequestedWidth = maximumWidth + 200, RequestedHeight = maximumHeight + 200,
+                ActualWidth = boundedSize.Width, ActualHeight = boundedSize.Height,
+                IsMaximizable = presenter.IsMaximizable, IsResizable = presenter.IsResizable,
+                CollapsedGap = collapsedGap, CollapsedActionsVisible = collapsedActionsVisible,
+                ExpandedActionsVisible = expandedActionsVisible, RestoredFooterDelta = Math.Abs(restoredFooter - collapsedFooter) };
+
+            return !presenter.IsMaximizable && presenter.IsResizable
+                && boundedSize.Width <= maximumWidth && boundedSize.Height <= maximumHeight
+                && collapsedGap is >= 0 and <= 16 && Math.Abs(restoredFooter - collapsedFooter) <= 1
+                && collapsedActionsVisible && expandedActionsVisible && AppWindow.Size.Equals(boundedSize);
+        }
+        finally
+        {
+            AdvancedOptions.IsExpanded = false;
+            SettingsScroll.ChangeView(null, 0, null, true);
+            AppWindow.Resize(originalSize);
+            await Task.Delay(150);
+            Root.UpdateLayout();
         }
     }
 
@@ -521,24 +685,42 @@ public sealed partial class MainWindow : Window
         Root.UpdateLayout();
         var originalSize = AppWindow.Size;
         var headerPosition = SessionHeader.TransformToVisual(Root).TransformPoint(default).Y;
-        var footerPosition = OperationFooter.TransformToVisual(Root).TransformPoint(default).Y;
         try
         {
             PreferencesButton.Focus(FocusState.Programmatic);
             SettingsScroll.ChangeView(null, 0, null, true);
             AdvancedOptions.IsExpanded = true;
-            await Task.Delay(300);
-            Root.UpdateLayout();
-            var toggleVisible = IsInsideViewport(InitialDelayToggle, SettingsScroll);
+            var deadline = Environment.TickCount64 + 3000;
+            long? visibleSince = null;
+            while (Environment.TickCount64 < deadline)
+            {
+                await Task.Delay(40);
+                Root.UpdateLayout();
+                if (!_advancedRevealPending && IsInsideViewport(InitialDelayToggle, SettingsScroll))
+                {
+                    visibleSince ??= Environment.TickCount64;
+                    if (Environment.TickCount64 - visibleSince.Value >= 150)
+                        break;
+                }
+                else
+                {
+                    visibleSince = null;
+                }
+            }
+            var toggleVisible = visibleSince is { } since && Environment.TickCount64 - since >= 150
+                && IsInsideViewport(InitialDelayToggle, SettingsScroll);
             var sizeUnchanged = AppWindow.Size.Equals(originalSize);
             var headerStable = SessionHeader.TransformToVisual(Root).TransformPoint(default).Y == headerPosition;
-            var footerStable = OperationFooter.TransformToVisual(Root).TransformPoint(default).Y == footerPosition;
+            var footerGap = OperationFooter.TransformToVisual(Root).TransformPoint(default).Y
+                - SettingsScroll.TransformToVisual(Root).TransformPoint(default).Y - SettingsScroll.ActualHeight;
+            var footerFollowsContent = footerGap >= 0 && footerGap <= Layout.RowSpacing + 1;
             _advancedRevealCheck = new { ToggleVisible = toggleVisible, Offset = SettingsScroll.VerticalOffset,
                 ToggleY = InitialDelayToggle.TransformToVisual(SettingsScroll).TransformPoint(default).Y,
                 ToggleHeight = InitialDelayToggle.ActualHeight, SettingsHeight = SettingsScroll.ActualHeight,
-                SizeUnchanged = sizeUnchanged, HeaderStable = headerStable, FooterStable = footerStable };
+                RevealPending = _advancedRevealPending, ScrollableHeight = SettingsScroll.ScrollableHeight,
+                SizeUnchanged = sizeUnchanged, HeaderStable = headerStable, FooterFollowsContent = footerFollowsContent, FooterGap = footerGap };
             return toggleVisible && SettingsScroll.VerticalOffset > 0 && AreSecondaryActionsVisible()
-                && sizeUnchanged && headerStable && footerStable;
+                && sizeUnchanged && headerStable && footerFollowsContent;
         }
         finally
         {

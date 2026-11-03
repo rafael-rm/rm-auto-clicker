@@ -89,6 +89,9 @@ foreach ($run in 1..2) {
         $null -eq $report.InputAttempts -or $report.InputAttempts -ne 0) {
         throw 'The report does not confirm a successful startup without clicks.'
     }
+    if (-not $report.WindowSizingVerified) {
+        throw 'The window size limits or compact footer layout were not verified.'
+    }
     if (-not $report.ApplicationIconPresent -or -not $report.WindowIconPresent) {
         throw 'The bundled application icon or the window icons are missing.'
     }

@@ -193,6 +193,18 @@ Falhas de I/O ou permissão no logger são encaminhadas para `Trace`. Os testes 
 
 ## Interface e localização
 
+### Dimensões e fluxo do layout
+
+A janela abre em 760 × 650 e permite redimensionamento entre 400 × 600 e 900 × 900 unidades lógicas. Os limites são convertidos pelo DPI do HWND e reduzidos quando necessário para caber na área útil do monitor. A configuração é reavaliada no carregamento e nas mudanças de posição, apresentador ou escala da raiz XAML.
+
+O `OverlappedPresenter` mantém `IsResizable=true` e `IsMaximizable=false`. Os limites são aplicados por `PreferredMinimumWidth/Height` e `PreferredMaximumWidth/Height`, que também restringem tentativas de `AppWindow.Resize`. [Referência Microsoft](https://learn.microsoft.com/pt-br/windows/apps/develop/ui/manage-app-windows).
+
+O formulário usa três linhas `Auto` em um Grid alinhado ao topo. O limite de altura do ScrollViewer central é calculado com a altura disponível, descontando cabeçalho, rodapé, padding e espaçamentos. Em conteúdo curto, o rodapé acompanha o formulário. Quando o conteúdo excede o espaço disponível, apenas as configurações rolam; cabeçalho e ações ficam acessíveis.
+
+A revelação das opções avançadas acompanha a medição e a posição do conteúdo até ficarem estáveis. A operação é assíncrona, limitada a dois segundos e encerrada ao recolher o menu, iniciar outra expansão ou fechar a janela. A rolagem posiciona a primeira opção no viewport sem redimensionar a janela.
+
+### Campos e idiomas
+
 O ViewModel usa propriedades e comandos gerados pelo CommunityToolkit.Mvvm. A janela atualiza a apresentação a cada 250 ms por `DispatcherQueueTimer`; essa frequência não determina a emissão dos cliques.
 
 Os `NumberBox` usam a cultura regional para números. O texto ainda em edição é confirmado antes de iniciar por atalho; parar independe da validade do campo. [AutoDismissNumberBox](../src/RM.AutoClicker.Desktop/Controls/AutoDismissNumberBox.cs) fecha o popup de setas ao clicar fora, confirmando a edição. Evite substituir esse comportamento sem testar foco, valor vazio e reabertura no controle real.
@@ -247,6 +259,8 @@ O script copia somente o EXE para uma pasta com espaços, usa outro diretório d
 - Variáveis de teste: `RM_AUTO_CLICKER_SMOKE_REPORT` e `RM_AUTO_CLICKER_SMOKE_LANGUAGE`.
 
 Relatórios: `artifacts/smoke/<identificador>/report-1.json` e `report-2.json`. `Success=true` confirma inicialização básica; a aprovação completa depende de todos os campos verificados pelo script.
+
+O relatório inclui `WindowSizingVerified`: tenta exceder os limites nativos, verifica o tamanho resultante, as ações acessíveis com o menu aberto e fechado e o retorno do rodapé ao recolher o conteúdo. `AdvancedRevealVerified` exige que a primeira opção avançada seja revelada por rolagem, com a janela e o cabeçalho estáveis e o rodapé acompanhando o viewport.
 
 ## Publicação local
 
@@ -340,7 +354,6 @@ As configurações remotas são administradas pelo responsável pelo repositóri
 
 ## Limitações atuais e critérios de aceite
 
-- O smoke completo ainda reprova `AdvancedRevealVerified=false`: revelar a primeira opção avançada não atende ao viewport esperado. Inicialização, ícones e layout responsivo já foram verificados separadamente; isso não transforma o smoke completo em aprovação.
 - O CI não executa o EXE final em uma sessão gráfica. O aceite local de outro build não comprova os mesmos bytes gerados pelo CI; uma publicação exige verificar o pacote que será distribuído.
 - O smoke de reinício verifica o relatório do novo processo, mas ainda não supervisiona completamente seu encerramento. O modo smoke desabilita a instância única e não comprova sozinho o reinício normal com o mutex ativo.
 - Hotkeys e emergência são processadas pela thread da UI. Um bloqueio dessa thread pode atrasar a parada enquanto o worker do motor continua ativo.
