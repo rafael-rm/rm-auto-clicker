@@ -26,6 +26,7 @@ public partial class MainViewModel : ObservableObject
     private bool _restarting;
     private AppSettings _savedSettings;
     private readonly SemaphoreSlim _preferencesGate = new(1, 1);
+    private Task _minimizeToTraySaveTask = Task.CompletedTask;
     private double _sliderClicksPerSecond = 10;
     private ClickPlan? _activePlan;
     private string _noticeOrigin = string.Empty;
@@ -58,6 +59,7 @@ public partial class MainViewModel : ObservableObject
         MaximumDurationSeconds = plan.MaximumDuration?.TotalSeconds ?? 30;
         Hotkey = loaded.Settings.EffectiveHotkey;
         ThemeIndex = loaded.Settings.ThemeIndex;
+        MinimizeToTray = loaded.Settings.MinimizeToTray;
         Message = loaded.Warning is { } warning ? _strings.Get(warning.ToString()) : string.Empty;
         HotkeyStatus = _strings.Get("PreparingHotkeys");
         _loading = false;
@@ -131,6 +133,9 @@ public partial class MainViewModel : ObservableObject
     public partial int ThemeIndex { get; set; }
 
     [ObservableProperty]
+    public partial bool MinimizeToTray { get; set; }
+
+    [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasMessage))]
     public partial string Message { get; set; } = string.Empty;
 
@@ -155,6 +160,8 @@ public partial class MainViewModel : ObservableObject
     public partial int LanguageIndex { get; set; }
 
     public bool CanChangeLanguage => _canSave && !_shuttingDown && !_restarting;
+    public bool CanChangeMinimizeToTray => _canSave && !_shuttingDown && !_restarting;
+    public Task MinimizeToTraySaveTask => _minimizeToTraySaveTask;
     private string SelectedLanguagePreference => LanguageIndex >= 0 && LanguageIndex < AppStrings.Preferences.Count
         ? AppStrings.Preferences[LanguageIndex] : _savedSettings.Language;
     public bool LanguageChangePending => _savedSettings.Language != _initialLanguagePreference;
@@ -304,6 +311,7 @@ public partial class MainViewModel : ObservableObject
     {
         _shuttingDown = true;
         OnPropertyChanged(nameof(CanChangeLanguage));
+        OnPropertyChanged(nameof(CanChangeMinimizeToTray));
         RestartCommand.NotifyCanExecuteChanged();
         CancelHotkeyCapture();
         OnPropertyChanged(nameof(CanEditHotkey));
@@ -369,7 +377,7 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanSave))]
     public async Task SaveAsync()
     {
-        await LanguageSaveTask;
+        await Task.WhenAll(LanguageSaveTask, MinimizeToTraySaveTask);
         if (!_canSave || !TryBuildPlan(out var plan, out _))
             return;
 
@@ -377,7 +385,7 @@ public partial class MainViewModel : ObservableObject
         try
         {
             var settings = new AppSettings(Plan: plan, Hotkey: Hotkey, ThemeIndex: ThemeIndex,
-                HasInitialDelay: HasInitialDelay, Language: SelectedLanguagePreference);
+                HasInitialDelay: HasInitialDelay, Language: SelectedLanguagePreference, MinimizeToTray: MinimizeToTray);
             await _settings.SaveAsync(settings);
             _savedSettings = settings;
             ConfirmPreferencesSaved();
@@ -447,6 +455,7 @@ public partial class MainViewModel : ObservableObject
     private void RefreshRestartState()
     {
         OnPropertyChanged(nameof(CanChangeLanguage));
+        OnPropertyChanged(nameof(CanChangeMinimizeToTray));
         OnPropertyChanged(nameof(CanEditHotkey));
         RestartCommand.NotifyCanExecuteChanged();
         Refresh();
@@ -497,6 +506,12 @@ public partial class MainViewModel : ObservableObject
 
     partial void OnThemeIndexChanged(int value) => ThemeChanged?.Invoke(value);
 
+    partial void OnMinimizeToTrayChanged(bool value)
+    {
+        if (!_loading)
+            _minimizeToTraySaveTask = SaveMinimizeToTrayAsync();
+    }
+
     partial void OnLanguageIndexChanged(int value)
     {
         if (!_loading && value >= 0 && value < AppStrings.Preferences.Count)
@@ -526,6 +541,50 @@ public partial class MainViewModel : ObservableObject
             _saveFailed = true;
             UpdateSaveFeedback();
             _writeDiagnostic("LanguageSaveFailed", exception);
+        }
+        finally
+        {
+            _preferencesGate.Release();
+        }
+    }
+
+    private async Task SaveMinimizeToTrayAsync()
+    {
+        if (!CanChangeMinimizeToTray)
+        {
+            _loading = true;
+            MinimizeToTray = _savedSettings.MinimizeToTray;
+            _loading = false;
+            UpdateSaveFeedback();
+            return;
+        }
+
+        var requestedValue = MinimizeToTray;
+        await _preferencesGate.WaitAsync();
+        try
+        {
+            requestedValue = MinimizeToTray;
+            if (requestedValue == _savedSettings.MinimizeToTray)
+                return;
+
+            var settings = _savedSettings with { MinimizeToTray = requestedValue };
+            await _settings.SaveAsync(settings);
+            _savedSettings = settings;
+            ClearNotice("preferences");
+            ConfirmPreferencesSaved();
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            ReportNotice("preferences", _strings.Get("SaveFailed"));
+            _saveFailed = true;
+            if (requestedValue == MinimizeToTray)
+            {
+                _loading = true;
+                MinimizeToTray = _savedSettings.MinimizeToTray;
+                _loading = false;
+            }
+            UpdateSaveFeedback();
+            _writeDiagnostic("MinimizeToTraySaveFailed", exception);
         }
         finally
         {
@@ -684,6 +743,7 @@ public partial class MainViewModel : ObservableObject
             : _saveFailed ? _strings.Get("UnsavedFailure")
             : plan != (_savedSettings.Plan ?? new ClickPlan()) || Hotkey != _savedSettings.EffectiveHotkey
                 || ThemeIndex != _savedSettings.ThemeIndex || HasInitialDelay != _savedSettings.HasInitialDelay
+                || MinimizeToTray != _savedSettings.MinimizeToTray
                 ? _strings.Get("Unsaved")
                 : _saveConfirmationTimestamp is { } timestamp && _timeProvider.GetElapsedTime(timestamp) < TimeSpan.FromSeconds(3)
                     ? _strings.Get("Saved") : string.Empty;
@@ -704,7 +764,7 @@ public partial class MainViewModel : ObservableObject
         base.OnPropertyChanged(args);
         if (args.PropertyName is nameof(ClicksPerSecond) or nameof(ButtonIndex) or nameof(HasInitialDelay) or nameof(InitialDelaySeconds)
             or nameof(HasClickLimit) or nameof(MaximumClicks) or nameof(HasDurationLimit) or nameof(MaximumDurationSeconds) or nameof(VariationPercent)
-            or nameof(ThemeIndex) or nameof(Hotkey) or nameof(IsCapturingHotkey) or nameof(PendingHotkey))
+            or nameof(ThemeIndex) or nameof(MinimizeToTray) or nameof(Hotkey) or nameof(IsCapturingHotkey) or nameof(PendingHotkey))
         {
             _saveConfirmationTimestamp = null;
             RefreshPresentation();

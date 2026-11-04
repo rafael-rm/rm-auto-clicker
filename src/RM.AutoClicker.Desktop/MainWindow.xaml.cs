@@ -29,6 +29,7 @@ public sealed partial class MainWindow : Window
     private readonly ClickSessionController _controller;
     private readonly WindowIntegration? _integration;
     private readonly DispatcherQueueTimer _timer;
+    private Microsoft.UI.System.ThemeSettings? _themeSettings;
     private readonly bool _smokeTest;
     private readonly SmokeInputEmitter? _smokeEmitter;
     private bool _closing;
@@ -57,6 +58,7 @@ public sealed partial class MainWindow : Window
             throw new InvalidOperationException($"Application restart failed: {reason}.");
         };
         InitializeComponent();
+        ConfigureCustomTitleBar();
         AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets", "App.ico"));
         Root.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(OnRootPointerPressed), true);
         Root.Language = strings.Language;
@@ -72,6 +74,7 @@ public sealed partial class MainWindow : Window
         AppWindow.Resize(new SizeInt32(Math.Min((int)(760 * scale), workArea.Width), Math.Min((int)(650 * scale), workArea.Height)));
         Root.Loaded += OnWindowLoaded;
         Root.SizeChanged += OnLayoutSizeChanged;
+        AppTitleBar.SizeChanged += OnLayoutSizeChanged;
         SessionHeader.SizeChanged += OnLayoutSizeChanged;
         OperationFooter.SizeChanged += OnLayoutSizeChanged;
         AppWindow.Changed += OnWindowChanged;
@@ -88,6 +91,7 @@ public sealed partial class MainWindow : Window
             try
             {
                 _integration = new(WindowNativeHandle(), strings, ViewModel.Hotkey);
+                _integration.Minimized += OnWindowMinimized;
                 _integration.ToggleRequested += () => ViewModel.Toggle(() =>
                 {
                     if (Root.XamlRoot is { } root)
@@ -135,6 +139,38 @@ public sealed partial class MainWindow : Window
     public InfoBarSeverity NoticeSeverity(bool isError) => isError ? InfoBarSeverity.Error : InfoBarSeverity.Warning;
     public string NoticeTitle(bool isError) => isError ? _strings.Get("OperationUnavailable") : _strings.Get("Attention");
     public Style? PrimaryButtonStyle(bool emphasize) => emphasize ? (Style)Application.Current.Resources["AccentButtonStyle"] : null;
+
+    private void ConfigureCustomTitleBar()
+    {
+        ExtendsContentIntoTitleBar = true;
+        if (AppWindow.Presenter is OverlappedPresenter presenter)
+            presenter.SetBorderAndTitleBar(hasBorder: true, hasTitleBar: false);
+        SetTitleBar(TitleBarDragRegion);
+        _themeSettings = Microsoft.UI.System.ThemeSettings.CreateForWindowId(AppWindow.Id);
+        UpdateWindowBorder();
+        _themeSettings.Changed += OnThemeSettingsChanged;
+    }
+
+    private void OnThemeSettingsChanged(Microsoft.UI.System.ThemeSettings sender, object args) =>
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            if (!_closing)
+                UpdateWindowBorder();
+        });
+
+    private void UpdateWindowBorder()
+    {
+        if (!OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000))
+            return;
+
+        // Hide only DWM's painted outline; keep the native frame for resizing.
+        // High contrast retains the system border so the window stays distinguishable.
+        const uint borderColorAttribute = 34;
+        uint borderColor = _themeSettings?.HighContrast == true ? 0xFFFFFFFF : 0xFFFFFFFE;
+        var result = DwmSetWindowAttribute(WindowNativeHandle(), borderColorAttribute, in borderColor, sizeof(uint));
+        if (result < 0)
+            AppDiagnostics.Write("WindowBorderCustomizationFailed", Marshal.GetExceptionForHR(result));
+    }
 
     private void ConfigureWindowBounds()
     {
@@ -195,8 +231,8 @@ public sealed partial class MainWindow : Window
         if (_closing || Root.ActualHeight <= 0)
             return;
 
-        var available = Math.Max(0, Root.ActualHeight - Layout.Padding.Top - Layout.Padding.Bottom
-            - SessionHeader.ActualHeight - OperationFooter.ActualHeight - 2 * Layout.RowSpacing);
+        var available = Math.Max(0, Root.ActualHeight - AppTitleBar.ActualHeight - Layout.Padding.Top - Layout.Padding.Bottom
+            - SessionHeader.ActualHeight - OperationFooter.ActualHeight - OperationFooter.Margin.Top - 2 * Layout.RowSpacing);
         if (Math.Abs(SettingsScroll.MaxHeight - available) > 0.5)
             SettingsScroll.MaxHeight = available;
     }
@@ -282,6 +318,10 @@ public sealed partial class MainWindow : Window
     }
 
     private nint WindowNativeHandle() => WinRT.Interop.WindowNative.GetWindowHandle(this);
+
+    [DllImport("dwmapi.dll")]
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+    private static extern int DwmSetWindowAttribute(nint window, uint attribute, in uint value, uint size);
 
     [DllImport("user32.dll", EntryPoint = "SendMessageW")]
     [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
@@ -376,12 +416,62 @@ public sealed partial class MainWindow : Window
             ViewModel.CancelHotkeyCapture();
     }
 
-    private void MinimizeToTray(object sender, RoutedEventArgs args)
+    private void OnWindowMinimized()
     {
+        DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () => _ = MinimizeWindowToTrayAsync());
+    }
+
+    private async Task MinimizeWindowToTrayAsync()
+    {
+        if (_closing || !ViewModel.MinimizeToTray)
+            return;
+
+        try
+        {
+            while (true)
+            {
+                var preferenceSave = ViewModel.MinimizeToTraySaveTask;
+                await preferenceSave;
+                if (ReferenceEquals(preferenceSave, ViewModel.MinimizeToTraySaveTask))
+                    break;
+            }
+        }
+        catch (Exception exception)
+        {
+            AppDiagnostics.Write("MinimizeToTrayPreferenceWaitFailed", exception);
+            return;
+        }
+
+        if (_closing || !ViewModel.MinimizeToTray
+            || AppWindow.Presenter is not OverlappedPresenter presenter
+            || presenter.State != OverlappedPresenterState.Minimized)
+            return;
+
         PreferencesButton.Flyout?.Hide();
-        ViewModel.ReportTrayResult(_integration?.Hide() == true);
+        try
+        {
+            var hidden = _integration?.Hide() == true;
+            ViewModel.ReportTrayResult(hidden);
+            if (!hidden && presenter.State == OverlappedPresenterState.Minimized)
+                presenter.Restore();
+        }
+        catch (Exception exception)
+        {
+            ViewModel.ReportTrayResult(false);
+            AppDiagnostics.Write("MinimizeToTrayFailed", exception);
+            if (presenter.State == OverlappedPresenterState.Minimized)
+                presenter.Restore();
+        }
         ViewModel.Refresh();
     }
+
+    private void OnTitleBarMinimize(object sender, RoutedEventArgs args)
+    {
+        if (!_closing && AppWindow.Presenter is OverlappedPresenter presenter)
+            presenter.Minimize();
+    }
+
+    private void OnTitleBarClose(object sender, RoutedEventArgs args) => _ = CloseAsync();
 
     private async void OnClosing(AppWindow sender, AppWindowClosingEventArgs args)
     {
@@ -398,6 +488,8 @@ public sealed partial class MainWindow : Window
             return;
 
         _closing = true;
+        if (_themeSettings is not null)
+            _themeSettings.Changed -= OnThemeSettingsChanged;
         PreferencesButton.Focus(FocusState.Programmatic);
         ViewModel.BeginShutdown();
         try
@@ -469,7 +561,7 @@ public sealed partial class MainWindow : Window
                 await ViewModel.RestartCommand.ExecuteAsync(null);
                 throw new InvalidOperationException("The native restart returned without relaunching the application: " + ViewModel.RestartError);
             }
-            FrameworkElement initialLastContent = SaveFeedbackText.Visibility == Visibility.Visible ? SaveFeedbackText : AdvancedOptions;
+            FrameworkElement initialLastContent = AdvancedOptions;
             var initialContentBottom = initialLastContent.TransformToVisual(Root).TransformPoint(default).Y + initialLastContent.ActualHeight;
             var initialUnusedSpace = Math.Max(0, OperationFooter.TransformToVisual(Root).TransformPoint(default).Y - initialContentBottom);
             var initialActionsVisible = AreSecondaryActionsVisible();
@@ -496,6 +588,7 @@ public sealed partial class MainWindow : Window
                 InitialActionsVisible = initialActionsVisible,
                 AdvancedRevealVerified = advancedRevealVerified,
                 AdvancedRevealCheck = _advancedRevealCheck,
+                WindowTitleBarVerified = AreTitleBarActionsAccessible(),
                 Language = _strings.Language,
                 LocalizedStartLabel = StartButton.Content,
                 ProductName = ProductNameText.Text,
@@ -523,6 +616,7 @@ public sealed partial class MainWindow : Window
                 HotkeyStatus = _integration?.Status,
                 AdvancedOptionsCollapsed = !AdvancedOptions.IsExpanded,
                 CountdownDisabledByDefault = !ViewModel.HasInitialDelay && InitialDelayToggle.IsChecked == false,
+                MinimizeToTrayDisabledByDefault = !ViewModel.MinimizeToTray,
                 MetricsBelowStatus = SessionMetrics.TransformToVisual(Root).TransformPoint(default).Y
                     >= SessionStatus.TransformToVisual(Root).TransformPoint(default).Y + SessionStatus.ActualHeight,
                 PersistentOperationLayout = Grid.GetRow(SettingsScroll) == 1 && Grid.GetRow(OperationFooter) == 2
@@ -562,7 +656,7 @@ public sealed partial class MainWindow : Window
             await Task.Delay(180);
             Root.UpdateLayout();
             var boundedSize = AppWindow.Size;
-            FrameworkElement lastContent = SaveFeedbackText.Visibility == Visibility.Visible ? SaveFeedbackText : AdvancedOptions;
+            FrameworkElement lastContent = AdvancedOptions;
             var contentBottom = lastContent.TransformToVisual(Root).TransformPoint(default).Y + lastContent.ActualHeight;
             var collapsedFooter = OperationFooter.TransformToVisual(Root).TransformPoint(default).Y;
             var collapsedGap = collapsedFooter - contentBottom;
@@ -632,13 +726,16 @@ public sealed partial class MainWindow : Window
                     var footerBottom = footerPosition + OperationFooter.ActualHeight;
                     var actionsFit = IsInsideRootHorizontally(StartButton) && IsInsideRootHorizontally(StopButton)
                         && IsInsideRootHorizontally(PreferencesButton) && AreSecondaryActionsVisible();
+                    var titleBarActionsFit = AreTitleBarActionsAccessible();
                     _responsiveChecks.Add(new { Width = width, Height = height, FontScale = fontScale, HasErrors = hasErrors,
                         RootWidth = Root.ActualWidth, RootHeight = Root.ActualHeight, MouseColumn = Grid.GetColumn(MouseInput),
                         HeaderHeight = SessionHeader.ActualHeight, ProductNameHeight = ProductNameText.ActualHeight,
                         SpeedWidth = SpeedInput.ActualWidth, SettingsHeight = SettingsScroll.ActualHeight, FooterBottom = footerBottom,
-                        SecondaryActionsVisible = AreSecondaryActionsVisible(), ActionsFit = actionsFit });
+                        SecondaryActionsVisible = AreSecondaryActionsVisible(), ActionsFit = actionsFit,
+                        WindowTitleBarActionsFit = titleBarActionsFit });
                     if (Grid.GetColumn(MouseInput) != (Root.ActualWidth >= 640 ? 1 : 0) || SpeedInput.ActualWidth < 100
                         || SettingsScroll.ActualHeight < 96 || footerBottom > Root.ActualHeight + 1 || !actionsFit
+                        || !titleBarActionsFit
                         || SecondaryActions.Visibility != Visibility.Visible)
                         return false;
                     SettingsScroll.ChangeView(null, SettingsScroll.ScrollableHeight, null, true);
@@ -668,8 +765,26 @@ public sealed partial class MainWindow : Window
         return position >= 0 && position + element.ActualWidth <= Root.ActualWidth + 1;
     }
 
+    private bool AreTitleBarActionsAccessible()
+    {
+        Root.UpdateLayout();
+        var minimize = WindowMinimizeButton.TransformToVisual(AppTitleBar).TransformPoint(default);
+        var close = WindowCloseButton.TransformToVisual(AppTitleBar).TransformPoint(default);
+        var productName = TitleBarProductName.TransformToVisual(AppTitleBar).TransformPoint(default);
+        return AppWindow.Presenter is OverlappedPresenter { HasBorder: true, HasTitleBar: false, IsResizable: true, IsMaximizable: false }
+            && AppTitleBar.ActualHeight >= 32
+            && !string.IsNullOrWhiteSpace(Microsoft.UI.Xaml.Automation.AutomationProperties.GetName(WindowMinimizeButton))
+            && !string.IsNullOrWhiteSpace(Microsoft.UI.Xaml.Automation.AutomationProperties.GetName(WindowCloseButton))
+            && WindowMinimizeButton.ActualHeight >= 32 && WindowCloseButton.ActualHeight >= 32
+            && Math.Abs(minimize.Y - close.Y) <= 1
+            && Math.Abs(minimize.X + WindowMinimizeButton.ActualWidth - close.X) <= 1
+            && close.X + WindowCloseButton.ActualWidth <= AppTitleBar.ActualWidth + 1
+            && productName.X + TitleBarProductName.ActualWidth <= minimize.X + 1;
+    }
+
     private bool AreSecondaryActionsVisible() => SecondaryActions.Visibility == Visibility.Visible
-        && IsInsideViewport(SavePreferencesButton, Root) && IsInsideViewport(TrayButton, Root);
+        && IsInsideViewport(SavePreferencesButton, Root)
+        && (SaveFeedbackText.Visibility != Visibility.Visible || IsInsideViewport(SaveFeedbackText, Root));
 
     private static bool IsInsideViewport(FrameworkElement element, FrameworkElement viewport)
     {
@@ -713,7 +828,7 @@ public sealed partial class MainWindow : Window
             var headerStable = SessionHeader.TransformToVisual(Root).TransformPoint(default).Y == headerPosition;
             var footerGap = OperationFooter.TransformToVisual(Root).TransformPoint(default).Y
                 - SettingsScroll.TransformToVisual(Root).TransformPoint(default).Y - SettingsScroll.ActualHeight;
-            var footerFollowsContent = footerGap >= 0 && footerGap <= Layout.RowSpacing + 1;
+            var footerFollowsContent = footerGap >= 0 && footerGap <= Layout.RowSpacing + OperationFooter.Margin.Top + 1;
             _advancedRevealCheck = new { ToggleVisible = toggleVisible, Offset = SettingsScroll.VerticalOffset,
                 ToggleY = InitialDelayToggle.TransformToVisual(SettingsScroll).TransformPoint(default).Y,
                 ToggleHeight = InitialDelayToggle.ActualHeight, SettingsHeight = SettingsScroll.ActualHeight,

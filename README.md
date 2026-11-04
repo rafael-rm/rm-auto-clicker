@@ -29,11 +29,11 @@ O atraso inicial vem desativado. Os cliques são suspensos enquanto o cursor est
 
 ## Preferências e bandeja
 
-Em **Preferências**, escolha o tema e o idioma. Depois de trocar o idioma, use **Reiniciar agora** para aplicá-lo.
+Em **Preferências**, escolha o tema e o idioma. Depois de trocar o idioma, use **Reiniciar agora** para aplicá-lo. A opção **Minimizar para a bandeja** fica desativada por padrão e é salva ao selecioná-la.
 
 Para mudar o atalho, clique em **Alterar atalho**, pressione a combinação desejada e confirme em **Aplicar atalho**. Se a combinação estiver indisponível, o atalho anterior continua valendo.
 
-Use **Ocultar** para deixar o aplicativo na bandeja do Windows. Dê dois cliques no ícone para reabrir a janela. Fechar a janela encerra o aplicativo e os cliques.
+Por padrão, minimizar mantém a janela na barra de tarefas. Ative **Minimizar para a bandeja** para ocultá-la da barra e deixá-la na área de notificação; para reabrir, dê dois cliques no ícone próximo ao relógio ou escolha **Abrir** no menu do ícone. Fechar a janela encerra o aplicativo e os cliques.
 
 ## Configurações e logs
 

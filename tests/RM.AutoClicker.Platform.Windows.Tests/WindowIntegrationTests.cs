@@ -273,6 +273,22 @@ public sealed class WindowIntegrationTests
     }
 
     [Fact]
+    public void ReportsMinimizedWindowSizeTransitionsOnlyOnceUntilRestored()
+    {
+        var api = new WindowApi();
+        using var integration = new WindowIntegration(1, api, TestStrings.Portuguese);
+        var minimized = 0;
+        integration.Minimized += () => minimized++;
+
+        api.Send(0x0005, 1);
+        api.Send(0x0005, 1);
+        api.Send(0x0005, 0);
+        api.Send(0x0005, 1);
+
+        Assert.Equal(2, minimized);
+    }
+
+    [Fact]
     public void HotkeyConflictKeepsThePreviousRegistration()
     {
         var api = new WindowApi();

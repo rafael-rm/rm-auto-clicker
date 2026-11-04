@@ -2,9 +2,13 @@
 <root>
   <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
   <resheader name="version"><value>2.0</value></resheader>
+  <data name="WindowMinimize.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Minimizar janela</value></data>
+  <data name="WindowMinimize.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve"><value>Minimiza a janela. O destino depende da preferência de bandeja.</value></data>
+  <data name="WindowClose.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Fechar RM Auto Clicker</value></data>
+  <data name="WindowClose.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve"><value>Salva as preferências e encerra o aplicativo.</value></data>
   <data name="Preferences.Content" xml:space="preserve"><value>Preferências</value></data>
   <data name="Preferences.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Abrir preferências</value></data>
-  <data name="Preferences.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve"><value>Tema e idioma da interface. Salvar e Ocultar permanecem no rodapé.</value></data>
+  <data name="Preferences.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve"><value>Tema, idioma e comportamento ao minimizar.</value></data>
   <data name="Theme.Header" xml:space="preserve"><value>Tema da interface</value></data>
   <data name="ThemeSystem" xml:space="preserve"><value>Sistema</value></data>
   <data name="ThemeLight" xml:space="preserve"><value>Claro</value></data>
@@ -12,6 +16,9 @@
   <data name="LanguagePicker.Header" xml:space="preserve"><value>Idioma</value></data>
   <data name="LanguageAutomatic" xml:space="preserve"><value>Automático — Windows</value></data>
   <data name="LanguageHint.Text" xml:space="preserve"><value>O idioma é salvo ao escolher e aplicado na próxima abertura. Os formatos numéricos seguem a região do Windows.</value></data>
+  <data name="MinimizeToTray.Content" xml:space="preserve"><value>Minimizar para a bandeja</value></data>
+  <data name="MinimizeToTray.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve"><value>Quando ativada, minimizar oculta a janela da barra de tarefas. Clique duas vezes no ícone ou use Abrir no menu para restaurá-la.</value></data>
+  <data name="MinimizeToTrayHint.Text" xml:space="preserve"><value>Para reabrir, clique duas vezes no ícone próximo ao relógio.</value></data>
   <data name="LanguagePending.Message" xml:space="preserve"><value>Reinicie o aplicativo para aplicar o novo idioma. A sessão de cliques será encerrada.</value></data>
   <data name="RestartApp.Content" xml:space="preserve"><value>Reiniciar agora</value></data>
   <data name="Restarting" xml:space="preserve"><value>Reiniciando o aplicativo…</value></data>
@@ -58,9 +65,6 @@
   <data name="Save.Content" xml:space="preserve"><value>Salvar</value></data>
   <data name="Save.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Salvar preferências</value></data>
   <data name="Save.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve"><value>Salva o plano válido, tema e atalho aplicado. Também salva ao iniciar e fechar; não confirma o candidato de atalho.</value></data>
-  <data name="Hide.Content" xml:space="preserve"><value>Ocultar</value></data>
-  <data name="Hide.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Ocultar na bandeja</value></data>
-  <data name="Hide.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve"><value>Ocultar na bandeja. Dê dois cliques no ícone para reabrir. Fechar a janela encerra o aplicativo.</value></data>
   <data name="CapturePrompt" xml:space="preserve"><value>Pressione o atalho…</value></data>
   <data name="NextPlan" xml:space="preserve"><value>Próxima sessão: {0}</value></data>
   <data name="CurrentPlan" xml:space="preserve"><value>Sessão atual: {0}</value></data>

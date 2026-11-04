@@ -92,6 +92,9 @@ foreach ($run in 1..2) {
     if (-not $report.WindowSizingVerified) {
         throw 'The window size limits or compact footer layout were not verified.'
     }
+    if (-not $report.WindowTitleBarVerified) {
+        throw 'The custom title bar controls overlap or are missing accessible names.'
+    }
     if (-not $report.ApplicationIconPresent -or -not $report.WindowIconPresent) {
         throw 'The bundled application icon or the window icons are missing.'
     }
@@ -111,7 +114,7 @@ foreach ($run in 1..2) {
     if (($Language -ne 'auto' -and $report.Language -cne $Language) -or $report.LocalizedStartLabel -cne $expectedLabels[$report.Language][1]) {
         throw 'The interface does not use the selected display language.'
     }
-    if (-not $report.InitialCompositionVerified -or -not $report.InitialActionsVisible -or -not $report.AdvancedRevealVerified -or -not $report.AdvancedOptionsCollapsed -or -not $report.CountdownDisabledByDefault -or -not $report.MetricsBelowStatus -or -not $report.PersistentOperationLayout -or -not $report.HotkeyActionsHiddenByDefault -or -not $report.ResponsiveLayoutVerified -or -not $report.NumericInputEditingVerified -or -not $report.UncommittedNumericInputVerified -or -not $report.NumericPopupDismissalVerified) {
+    if (-not $report.InitialCompositionVerified -or -not $report.InitialActionsVisible -or -not $report.AdvancedRevealVerified -or -not $report.AdvancedOptionsCollapsed -or -not $report.CountdownDisabledByDefault -or -not $report.MinimizeToTrayDisabledByDefault -or -not $report.MetricsBelowStatus -or -not $report.PersistentOperationLayout -or -not $report.HotkeyActionsHiddenByDefault -or -not $report.ResponsiveLayoutVerified -or -not $report.NumericInputEditingVerified -or -not $report.UncommittedNumericInputVerified -or -not $report.NumericPopupDismissalVerified) {
         throw 'The interface does not confirm the expected visual hierarchy and defaults.'
     }
 

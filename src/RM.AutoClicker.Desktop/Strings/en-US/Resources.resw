@@ -2,9 +2,13 @@
 <root>
   <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
   <resheader name="version"><value>2.0</value></resheader>
+  <data name="WindowMinimize.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Minimize window</value></data>
+  <data name="WindowMinimize.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve"><value>Minimizes the window. Its destination depends on the tray preference.</value></data>
+  <data name="WindowClose.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Close RM Auto Clicker</value></data>
+  <data name="WindowClose.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve"><value>Saves preferences and exits the application.</value></data>
   <data name="Preferences.Content" xml:space="preserve"><value>Preferences</value></data>
   <data name="Preferences.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Open preferences</value></data>
-  <data name="Preferences.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve"><value>Interface theme and language. Save and Hide remain in the footer.</value></data>
+  <data name="Preferences.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve"><value>Theme, language and minimize behavior.</value></data>
   <data name="Theme.Header" xml:space="preserve"><value>Interface theme</value></data>
   <data name="ThemeSystem" xml:space="preserve"><value>System</value></data>
   <data name="ThemeLight" xml:space="preserve"><value>Light</value></data>
@@ -12,6 +16,9 @@
   <data name="LanguagePicker.Header" xml:space="preserve"><value>Language</value></data>
   <data name="LanguageAutomatic" xml:space="preserve"><value>Automatic — Windows</value></data>
   <data name="LanguageHint.Text" xml:space="preserve"><value>Language is saved when selected and applied on next launch. Number formats follow the Windows region.</value></data>
+  <data name="MinimizeToTray.Content" xml:space="preserve"><value>Minimize to the system tray</value></data>
+  <data name="MinimizeToTray.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve"><value>When enabled, minimizing hides the window from the taskbar. Double-click the icon or choose Open from its menu to restore it.</value></data>
+  <data name="MinimizeToTrayHint.Text" xml:space="preserve"><value>To reopen, double-click the icon near the clock.</value></data>
   <data name="LanguagePending.Message" xml:space="preserve"><value>Restart the application to apply the new language. The clicking session will end.</value></data>
   <data name="RestartApp.Content" xml:space="preserve"><value>Restart now</value></data>
   <data name="Restarting" xml:space="preserve"><value>Restarting the application…</value></data>
@@ -58,9 +65,6 @@
   <data name="Save.Content" xml:space="preserve"><value>Save</value></data>
   <data name="Save.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Save preferences</value></data>
   <data name="Save.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve"><value>Saves the valid plan, theme and applied shortcut. Also saves when starting and closing; does not confirm the shortcut candidate.</value></data>
-  <data name="Hide.Content" xml:space="preserve"><value>Hide</value></data>
-  <data name="Hide.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Hide in the system tray</value></data>
-  <data name="Hide.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve"><value>Hide in the system tray. Double-click the icon to reopen. Closing the window exits the application.</value></data>
   <data name="CapturePrompt" xml:space="preserve"><value>Press the shortcut…</value></data>
   <data name="NextPlan" xml:space="preserve"><value>Next session: {0}</value></data>
   <data name="CurrentPlan" xml:space="preserve"><value>Current session: {0}</value></data>

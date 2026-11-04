@@ -1,7 +1,7 @@
 namespace RM.AutoClicker.Core.Models;
 
 public sealed record AppSettings(int SchemaVersion = 2, ClickPlan? Plan = null, HotkeyGesture? Hotkey = null, int ThemeIndex = 0,
-    bool HasInitialDelay = false, string Language = "auto")
+    bool HasInitialDelay = false, string Language = "auto", bool MinimizeToTray = false)
 {
     public HotkeyGesture EffectiveHotkey => Hotkey ?? HotkeyGesture.Default;
 

@@ -22,6 +22,7 @@ public sealed class WindowIntegration : IHotkeyService, IDisposable
     private bool _sessionRegistered;
     private bool _trayAvailable;
     private bool _hidden;
+    private bool _windowMinimized;
     private bool _callbackFaulted;
     private HotkeyGesture _toggleHotkey;
     private int _sessionError;
@@ -70,6 +71,7 @@ public sealed class WindowIntegration : IHotkeyService, IDisposable
     public event Action? StopRequested;
     public event Action? ShowRequested;
     public event Action? ExitRequested;
+    public event Action? Minimized;
 
     public bool HotkeysReady => !_disposed && _toggleRegistered && _emergencyRegistered && _sessionRegistered && !_callbackFaulted;
     public bool EmergencyReady => !_disposed && _emergencyRegistered;
@@ -191,7 +193,18 @@ public sealed class WindowIntegration : IHotkeyService, IDisposable
         {
             if (!_disposed)
             {
-                if (message == HotkeyMessage)
+                if (message == 0x0005)
+                {
+                    var minimized = parameter == 1;
+                    if (minimized && !_windowMinimized)
+                    {
+                        _windowMinimized = true;
+                        Minimized?.Invoke();
+                    }
+                    else if (!minimized)
+                        _windowMinimized = false;
+                }
+                else if (message == HotkeyMessage)
                 {
                     if (parameter == EmergencyId && _emergencyRegistered)
                         StopRequested?.Invoke();
