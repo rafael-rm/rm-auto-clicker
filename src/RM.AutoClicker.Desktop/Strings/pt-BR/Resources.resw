@@ -9,21 +9,18 @@
   <data name="Preferences.Content" xml:space="preserve"><value>Preferências</value></data>
   <data name="Preferences.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Abrir preferências</value></data>
   <data name="Preferences.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve"><value>Tema, idioma e comportamento ao minimizar.</value></data>
-  <data name="Theme.Header" xml:space="preserve"><value>Tema da interface</value></data>
+  <data name="Theme.Header" xml:space="preserve"><value>Tema</value></data>
   <data name="ThemeSystem" xml:space="preserve"><value>Sistema</value></data>
   <data name="ThemeLight" xml:space="preserve"><value>Claro</value></data>
   <data name="ThemeDark" xml:space="preserve"><value>Escuro</value></data>
   <data name="LanguagePicker.Header" xml:space="preserve"><value>Idioma</value></data>
   <data name="LanguageAutomatic" xml:space="preserve"><value>Automático — Windows</value></data>
-  <data name="LanguageHint.Text" xml:space="preserve"><value>O idioma é salvo ao escolher e aplicado na próxima abertura. Os formatos numéricos seguem a região do Windows.</value></data>
   <data name="MinimizeToTray.Content" xml:space="preserve"><value>Minimizar para a bandeja</value></data>
   <data name="MinimizeToTray.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve"><value>Quando ativada, minimizar oculta a janela da barra de tarefas. Clique duas vezes no ícone ou use Abrir no menu para restaurá-la.</value></data>
-  <data name="MinimizeToTrayHint.Text" xml:space="preserve"><value>Para reabrir, clique duas vezes no ícone próximo ao relógio.</value></data>
-  <data name="LanguagePending.Message" xml:space="preserve"><value>Reinicie o aplicativo para aplicar o novo idioma. A sessão de cliques será encerrada.</value></data>
+  <data name="MinimizeToTrayHint.Text" xml:space="preserve"><value>Reabra com dois cliques no ícone próximo ao relógio.</value></data>
   <data name="RestartApp.Content" xml:space="preserve"><value>Reiniciar agora</value></data>
   <data name="Restarting" xml:space="preserve"><value>Reiniciando o aplicativo…</value></data>
   <data name="RestartFailed" xml:space="preserve"><value>Não foi possível reiniciar. Tente novamente ou feche e reabra o aplicativo.</value></data>
-  <data name="PreferencesHint.Text" xml:space="preserve"><value>As preferências também são salvas ao iniciar e fechar.</value></data>
   <data name="ClickLabel.Text" xml:space="preserve"><value>Cliques</value></data>
   <data name="ClickLabel.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Cliques enviados</value></data>
   <data name="TimeLabel.Text" xml:space="preserve"><value>Tempo</value></data>
@@ -40,7 +37,7 @@
   <data name="MouseRight" xml:space="preserve"><value>Direito</value></data>
   <data name="MouseMiddle" xml:space="preserve"><value>Meio</value></data>
   <data name="HotkeyTitle.Text" xml:space="preserve"><value>Atalho para iniciar/parar</value></data>
-  <data name="HotkeyCapture.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve"><value>Esc cancela. O atalho atual permanece até Aplicar.</value></data>
+  <data name="HotkeyCapture.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve"><value>Esc cancela. O atalho atual permanece ativo até Aplicar.</value></data>
   <data name="ApplyHotkey.Content" xml:space="preserve"><value>Aplicar atalho</value></data>
   <data name="CancelHotkey.Content" xml:space="preserve"><value>Cancelar</value></data>
   <data name="Advanced.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Opções avançadas para a próxima sessão</value></data>
@@ -48,23 +45,22 @@
   <data name="StartTitle.Text" xml:space="preserve"><value>Início</value></data>
   <data name="Countdown.Content" xml:space="preserve"><value>Usar contagem regressiva</value></data>
   <data name="Delay.Header" xml:space="preserve"><value>Atraso inicial (segundos)</value></data>
-  <data name="CountdownHint.Text" xml:space="preserve"><value>Desligada por padrão. Sem contagem, inicia ao sair da janela do RM.AutoClicker.</value></data>
-  <data name="LimitsTitle.Text" xml:space="preserve"><value>Limites · com ambos ativos, para ao atingir o primeiro</value></data>
+  <data name="CountdownHint.Text" xml:space="preserve"><value>Desligada por padrão. Sem contagem, inicia ao sair da janela do RM Auto Clicker.</value></data>
+  <data name="LimitsTitle.Text" xml:space="preserve"><value>Limites</value></data>
   <data name="ClickLimitToggle.Content" xml:space="preserve"><value>Limitar quantidade</value></data>
   <data name="ClickLimit.Header" xml:space="preserve"><value>Quantidade de cliques</value></data>
   <data name="DurationToggle.Content" xml:space="preserve"><value>Limitar duração</value></data>
   <data name="Duration.Header" xml:space="preserve"><value>Duração (segundos)</value></data>
   <data name="RhythmTitle.Text" xml:space="preserve"><value>Ritmo</value></data>
   <data name="Variation.Header" xml:space="preserve"><value>Variação do intervalo (%)</value></data>
-  <data name="VariationHint.Text" xml:space="preserve"><value>Zero mantém o intervalo fixo. Com 20%, uma base de 100 ms varia entre 80 e 120 ms. A taxa observada depende do sistema.</value></data>
+  <data name="VariationHint.Text" xml:space="preserve"><value>Varia o tempo entre cliques. 0% mantém o intervalo fixo.</value></data>
   <data name="PendingHint.Text" xml:space="preserve"><value>Alterações na próxima sessão.</value></data>
-  <data name="ReviewTitle.Text" xml:space="preserve"><value>Revisar campos</value></data>
   <data name="Review.Content" xml:space="preserve"><value>Revisar</value></data>
   <data name="Start.Content" xml:space="preserve"><value>Iniciar</value></data>
   <data name="Stop.Content" xml:space="preserve"><value>Parar</value></data>
   <data name="Save.Content" xml:space="preserve"><value>Salvar</value></data>
   <data name="Save.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Salvar preferências</value></data>
-  <data name="Save.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve"><value>Salva o plano válido, tema e atalho aplicado. Também salva ao iniciar e fechar; não confirma o candidato de atalho.</value></data>
+  <data name="Save.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve"><value>Salva as configurações válidas e o atalho aplicado. Também salva ao iniciar e fechar.</value></data>
   <data name="CapturePrompt" xml:space="preserve"><value>Pressione o atalho…</value></data>
   <data name="NextPlan" xml:space="preserve"><value>Próxima sessão: {0}</value></data>
   <data name="CurrentPlan" xml:space="preserve"><value>Sessão atual: {0}</value></data>
@@ -88,7 +84,7 @@
   <data name="ReviewBeforeStart" xml:space="preserve"><value>Revise os campos destacados antes de iniciar.</value></data>
   <data name="CheckHotkeys" xml:space="preserve"><value>Verifique os atalhos.</value></data>
   <data name="FinishingPrevious" xml:space="preserve"><value>Finalizando a sessão anterior…</value></data>
-  <data name="Interval" xml:space="preserve"><value>Intervalo-base: {0:0.##} ms</value></data>
+  <data name="Interval" xml:space="preserve"><value>Intervalo: {0:0.##} ms</value></data>
   <data name="InvalidInterval" xml:space="preserve"><value>Intervalo inválido</value></data>
   <data name="Rate" xml:space="preserve"><value>Taxa média enviada: {0:0.0} cliques/s</value></data>
   <data name="Starting" xml:space="preserve"><value>Iniciando em {0:0} s…</value></data>
@@ -105,17 +101,12 @@
   <data name="PreparingHotkeys" xml:space="preserve"><value>Preparando atalhos…</value></data>
   <data name="StartFailed" xml:space="preserve"><value>Não foi possível iniciar. Verifique as configurações e tente novamente.</value></data>
   <data name="StopFailed" xml:space="preserve"><value>Não foi possível concluir a parada. Encerre o aplicativo.</value></data>
-  <data name="SaveFailed" xml:space="preserve"><value>Não foi possível salvar as preferências. As alterações continuam disponíveis nesta execução.</value></data>
+  <data name="SaveFailed" xml:space="preserve"><value>Não foi possível salvar. Tente novamente.</value></data>
   <data name="InvalidSettings" xml:space="preserve"><value>Revise as configurações antes de continuar.</value></data>
-  <data name="CaptureHint" xml:space="preserve"><value>Pressione uma tecla ou combinação. Esc cancela; Ctrl+Shift+F10 permanece reservado à emergência.</value></data>
-  <data name="CapturedSimple" xml:space="preserve"><value>{0} capturado. Teclas simples podem interferir na digitação. Clique em Aplicar para confirmar.</value></data>
-  <data name="Captured" xml:space="preserve"><value>{0} capturado. Clique em Aplicar para confirmar.</value></data>
+  <data name="CaptureHint" xml:space="preserve"><value>Pressione uma tecla ou combinação. Esc cancela.</value></data>
   <data name="HotkeyRegisterFailed" xml:space="preserve"><value>Não foi possível registrar essa combinação. O atalho anterior foi preservado.</value></data>
-  <data name="HotkeyApplying" xml:space="preserve"><value>{0} aplicado. Salvando atalho…</value></data>
-  <data name="HotkeyProtected" xml:space="preserve"><value>Atalho aplicado somente nesta execução. O arquivo de preferências protegido foi preservado.</value></data>
-  <data name="HotkeyTemporary" xml:space="preserve"><value>Atalho aplicado somente nesta execução.</value></data>
-  <data name="HotkeySaved" xml:space="preserve"><value>{0} aplicado e salvo.</value></data>
-  <data name="HotkeySaveFailed" xml:space="preserve"><value>Atalho aplicado somente nesta execução. Não foi possível salvar a combinação.</value></data>
+  <data name="HotkeyProtected" xml:space="preserve"><value>O atalho vale até fechar o aplicativo. O arquivo de preferências está protegido.</value></data>
+  <data name="HotkeySaveFailed" xml:space="preserve"><value>Não foi possível salvar o atalho. Ele vale até fechar o aplicativo.</value></data>
   <data name="IntegrationFailed" xml:space="preserve"><value>Não foi possível preparar a integração Windows. Reabra o aplicativo; o início está desabilitado.</value></data>
   <data name="TrayUnavailable" xml:space="preserve"><value>A bandeja não está disponível. A janela foi mantida visível; tente novamente em instantes.</value></data>
   <data name="Plan" xml:space="preserve"><value>{0:0.##} cliques/s · {1} · {2}</value></data>
@@ -126,10 +117,9 @@
   <data name="Unlimited" xml:space="preserve"><value>Sem limites · Sem atraso</value></data>
   <data name="NextOptions" xml:space="preserve"><value>Opções para a próxima sessão</value></data>
   <data name="PreferencesProtected" xml:space="preserve"><value>Gravação desativada · preferências protegidas.</value></data>
-  <data name="CorrectToSave" xml:space="preserve"><value>Corrija os campos para salvar as preferências.</value></data>
-  <data name="UnsavedFailure" xml:space="preserve"><value>Falha ao salvar · alterações somente nesta execução.</value></data>
-  <data name="Unsaved" xml:space="preserve"><value>Alterações ainda não salvas.</value></data>
-  <data name="Saved" xml:space="preserve"><value>Preferências salvas.</value></data>
+  <data name="UnsavedFailure" xml:space="preserve"><value>Não salvo</value></data>
+  <data name="Unsaved" xml:space="preserve"><value>Alterações não salvas</value></data>
+  <data name="Saved" xml:space="preserve"><value>Salvo</value></data>
   <data name="ChangeHotkey" xml:space="preserve"><value>Alterar atalho</value></data>
   <data name="OperationUnavailable" xml:space="preserve"><value>Operação indisponível</value></data>
   <data name="Attention" xml:space="preserve"><value>Atenção</value></data>
@@ -147,15 +137,23 @@
   <data name="SessionRelease" xml:space="preserve"><value>Não foi possível liberar o botão. Encerre o aplicativo e verifique o mouse.</value></data>
   <data name="IntegrationClosed" xml:space="preserve"><value>Integração encerrada.</value></data>
   <data name="IntegrationFaulted" xml:space="preserve"><value>Falha na integração Windows. Encerre e reabra o aplicativo.</value></data>
-  <data name="SessionProtectionUnavailable" xml:space="preserve"><value>Proteção de bloqueio/desconexão indisponível (código {0}). O início está desabilitado; reabra o RM.AutoClicker.</value></data>
+  <data name="SessionProtectionUnavailable" xml:space="preserve"><value>Proteção de bloqueio/desconexão indisponível (código {0}). O início está desabilitado; reabra o RM Auto Clicker.</value></data>
   <data name="TrayStatusUnavailable" xml:space="preserve"><value>{0} · Bandeja indisponível; a janela permanecerá acessível.</value></data>
   <data name="TrayTip" xml:space="preserve"><value>RM Auto Clicker — {0} · {1} inicia/para · Ctrl+Shift+F10 para</value></data>
   <data name="HotkeyConflict" xml:space="preserve"><value>{0} está indisponível (código {1}). Escolha outra combinação. O atalho anterior foi preservado.</value></data>
   <data name="HotkeyReleaseFailed" xml:space="preserve"><value>Não foi possível liberar a tecla anterior. A configuração anterior foi preservada.</value></data>
-  <data name="EmergencyConflict" xml:space="preserve"><value>Ctrl+Shift+F10 está indisponível. Feche o aplicativo que usa esse atalho e reabra o RM.AutoClicker.</value></data>
+  <data name="EmergencyConflict" xml:space="preserve"><value>Ctrl+Shift+F10 está indisponível. Feche o aplicativo que usa esse atalho e reabra o RM Auto Clicker.</value></data>
   <data name="HotkeyAvailable" xml:space="preserve"><value>{0} disponível</value></data>
   <data name="TrayOpen" xml:space="preserve"><value>Abrir RM Auto Clicker</value></data>
   <data name="TrayStop" xml:space="preserve"><value>Parar</value></data>
   <data name="TrayExit" xml:space="preserve"><value>Sair</value></data>
   <data name="SmokeLongNotice" xml:space="preserve"><value>Não foi possível salvar as preferências. As alterações continuam disponíveis nesta execução. Verifique o arquivo antes de tentar novamente; a execução não foi iniciada e as configurações anteriores foram preservadas.</value></data>
+  <data name="LanguagePending" xml:space="preserve"><value>Reinicie para aplicar o idioma.</value></data>
+  <data name="Review.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Revisar campos</value></data>
+  <data name="LimitsHint.Text" xml:space="preserve"><value>Para ao atingir o primeiro limite.</value></data>
+  <data name="LanguagePendingActive" xml:space="preserve"><value>Reinicie para aplicar o idioma. A sessão atual será encerrada.</value></data>
+  <data name="TrayPreferenceSaveFailed" xml:space="preserve"><value>Não foi possível salvar. Tente novamente. A opção de bandeja voltou ao valor salvo.</value></data>
+  <data name="LanguagePicker.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve"><value>Os formatos numéricos seguem a região do Windows.</value></data>
+  <data name="Variation.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve"><value>Com 20%, um intervalo de 100 ms varia entre 80 e 120 ms. A taxa observada depende do sistema.</value></data>
+  <data name="LanguagePicker.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve"><value>Os formatos numéricos seguem a região do Windows.</value></data>
 </root>

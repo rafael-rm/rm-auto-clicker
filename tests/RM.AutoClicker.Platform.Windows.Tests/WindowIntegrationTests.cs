@@ -392,6 +392,56 @@ public sealed class WindowIntegrationTests
         Assert.Equal([false, true], api.Visibility);
     }
 
+    [Fact]
+    public void FailedReplacementKeepsReadyShortcutAndExposesItsWarning()
+    {
+        var api = new WindowApi();
+        using var integration = new WindowIntegration(1, api, TestStrings.Portuguese);
+        Assert.False(integration.HasStatusWarning);
+        api.CanRegisterToggle = false;
+
+        Assert.False(integration.TryChangeHotkey(new(0x41, HotkeyModifiers.Control), out var error));
+        Assert.NotNull(error);
+        Assert.True(integration.HotkeysReady);
+        Assert.True(integration.HasStatusWarning);
+
+        api.CanRegisterToggle = true;
+        Assert.True(integration.TryChangeHotkey(new(0x42, HotkeyModifiers.Control), out _));
+        Assert.False(integration.HasStatusWarning);
+    }
+
+    [Fact]
+    public void TrayRecoveryClearsTheWarningWithoutRequiringShortcutChanges()
+    {
+        var api = new WindowApi { TrayAvailable = false };
+        using var integration = new WindowIntegration(1, api, TestStrings.Portuguese);
+        Assert.True(integration.HotkeysReady);
+        Assert.True(integration.HasStatusWarning);
+
+        api.TrayAvailable = true;
+        api.Send(WindowApi.TaskbarMessage);
+
+        Assert.True(integration.HotkeysReady);
+        Assert.False(integration.HasStatusWarning);
+    }
+
+    [Fact]
+    public void ReapplyingTheActiveShortcutClearsAFailedAttemptWarning()
+    {
+        var api = new WindowApi();
+        using var integration = new WindowIntegration(1, api, TestStrings.Portuguese);
+        api.CanRegisterToggle = false;
+        Assert.False(integration.TryChangeHotkey(new(0x41, HotkeyModifiers.Control), out _));
+        Assert.True(integration.HasStatusWarning);
+        var failureStatus = integration.Status;
+
+        api.CanRegisterToggle = true;
+        Assert.True(integration.TryChangeHotkey(HotkeyGesture.Default, out _));
+
+        Assert.NotEqual(failureStatus, integration.Status);
+        Assert.False(integration.HasStatusWarning);
+        Assert.True(integration.HotkeysReady);
+    }
     private sealed class WindowApi : IWindowIntegrationApi
     {
         public const uint TaskbarMessage = 0xC001;

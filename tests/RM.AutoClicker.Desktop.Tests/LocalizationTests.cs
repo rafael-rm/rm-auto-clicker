@@ -78,9 +78,10 @@ public sealed class LocalizationTests
         var markup = XDocument.Load(Path.Combine(AppContext.BaseDirectory, "MainWindow.xaml"));
         XNamespace xaml = "http://schemas.microsoft.com/winfx/2006/xaml";
         var preferences = markup.Descendants().Single(element => (string?)element.Attribute(xaml + "Name") == "PreferencesButton");
-        var notice = preferences.Descendants().Single(element => (string?)element.Attribute(xaml + "Uid") == "LanguagePending");
+        var notice = preferences.Descendants().Single(element => (string?)element.Attribute(xaml + "Name") == "LanguageRestartNotice");
         Assert.Equal("InfoBar", notice.Name.LocalName);
         Assert.Contains("LanguageChangePending", (string?)notice.Attribute("IsOpen"));
+        Assert.Contains("LanguageRestartMessage", (string?)notice.Attribute("Message"));
         var action = notice.Descendants().Single(element => (string?)element.Attribute(xaml + "Uid") == "RestartApp");
         Assert.Contains("RestartCommand", (string?)action.Attribute("Command"));
     }
@@ -94,7 +95,8 @@ public sealed class LocalizationTests
         var strings = TestStrings.Create(language);
         Assert.Equal(range, strings.Get("SpeedHint.Text"));
         Assert.Equal(restart, strings.Get("RestartApp.Content"));
-        Assert.False(string.IsNullOrWhiteSpace(strings.Get("LanguagePending.Message")));
+        Assert.False(string.IsNullOrWhiteSpace(strings.Get("LanguagePending")));
+        Assert.False(string.IsNullOrWhiteSpace(strings.Get("LanguagePendingActive")));
     }
 
     [Theory]

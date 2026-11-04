@@ -8,6 +8,8 @@ public interface IHotkeyService
 
     bool EmergencyReady { get; }
 
+    bool HasStatusWarning => true;
+
     string Status { get; }
 
     bool TryChangeHotkey(HotkeyGesture hotkey, out string? error);

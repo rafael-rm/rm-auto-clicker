@@ -9,21 +9,18 @@
   <data name="Preferences.Content" xml:space="preserve"><value>Preferences</value></data>
   <data name="Preferences.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Open preferences</value></data>
   <data name="Preferences.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve"><value>Theme, language and minimize behavior.</value></data>
-  <data name="Theme.Header" xml:space="preserve"><value>Interface theme</value></data>
+  <data name="Theme.Header" xml:space="preserve"><value>Theme</value></data>
   <data name="ThemeSystem" xml:space="preserve"><value>System</value></data>
   <data name="ThemeLight" xml:space="preserve"><value>Light</value></data>
   <data name="ThemeDark" xml:space="preserve"><value>Dark</value></data>
   <data name="LanguagePicker.Header" xml:space="preserve"><value>Language</value></data>
   <data name="LanguageAutomatic" xml:space="preserve"><value>Automatic — Windows</value></data>
-  <data name="LanguageHint.Text" xml:space="preserve"><value>Language is saved when selected and applied on next launch. Number formats follow the Windows region.</value></data>
   <data name="MinimizeToTray.Content" xml:space="preserve"><value>Minimize to the system tray</value></data>
   <data name="MinimizeToTray.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve"><value>When enabled, minimizing hides the window from the taskbar. Double-click the icon or choose Open from its menu to restore it.</value></data>
-  <data name="MinimizeToTrayHint.Text" xml:space="preserve"><value>To reopen, double-click the icon near the clock.</value></data>
-  <data name="LanguagePending.Message" xml:space="preserve"><value>Restart the application to apply the new language. The clicking session will end.</value></data>
+  <data name="MinimizeToTrayHint.Text" xml:space="preserve"><value>Reopen with a double-click on the icon near the clock.</value></data>
   <data name="RestartApp.Content" xml:space="preserve"><value>Restart now</value></data>
   <data name="Restarting" xml:space="preserve"><value>Restarting the application…</value></data>
   <data name="RestartFailed" xml:space="preserve"><value>The application could not restart. Try again or close and reopen it.</value></data>
-  <data name="PreferencesHint.Text" xml:space="preserve"><value>Preferences are also saved when starting and closing.</value></data>
   <data name="ClickLabel.Text" xml:space="preserve"><value>Clicks</value></data>
   <data name="ClickLabel.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Clicks sent</value></data>
   <data name="TimeLabel.Text" xml:space="preserve"><value>Time</value></data>
@@ -40,7 +37,7 @@
   <data name="MouseRight" xml:space="preserve"><value>Right</value></data>
   <data name="MouseMiddle" xml:space="preserve"><value>Middle</value></data>
   <data name="HotkeyTitle.Text" xml:space="preserve"><value>Start/stop shortcut</value></data>
-  <data name="HotkeyCapture.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve"><value>Esc cancels. The current shortcut stays active until Apply.</value></data>
+  <data name="HotkeyCapture.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve"><value>Esc cancels. The current shortcut stays active until you apply a new one.</value></data>
   <data name="ApplyHotkey.Content" xml:space="preserve"><value>Apply shortcut</value></data>
   <data name="CancelHotkey.Content" xml:space="preserve"><value>Cancel</value></data>
   <data name="Advanced.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Advanced options for the next session</value></data>
@@ -49,22 +46,21 @@
   <data name="Countdown.Content" xml:space="preserve"><value>Use countdown</value></data>
   <data name="Delay.Header" xml:space="preserve"><value>Initial delay (seconds)</value></data>
   <data name="CountdownHint.Text" xml:space="preserve"><value>Off by default. Without a countdown, starts when leaving the RM Auto Clicker window.</value></data>
-  <data name="LimitsTitle.Text" xml:space="preserve"><value>Limits · when both are active, stops at the first reached</value></data>
+  <data name="LimitsTitle.Text" xml:space="preserve"><value>Limits</value></data>
   <data name="ClickLimitToggle.Content" xml:space="preserve"><value>Limit click count</value></data>
   <data name="ClickLimit.Header" xml:space="preserve"><value>Click count</value></data>
   <data name="DurationToggle.Content" xml:space="preserve"><value>Limit duration</value></data>
   <data name="Duration.Header" xml:space="preserve"><value>Duration (seconds)</value></data>
   <data name="RhythmTitle.Text" xml:space="preserve"><value>Timing</value></data>
   <data name="Variation.Header" xml:space="preserve"><value>Interval variation (%)</value></data>
-  <data name="VariationHint.Text" xml:space="preserve"><value>Zero keeps a fixed interval. At 20%, a 100 ms base varies from 80 to 120 ms. The observed rate depends on the system.</value></data>
+  <data name="VariationHint.Text" xml:space="preserve"><value>Varies the time between clicks. 0% keeps a fixed interval.</value></data>
   <data name="PendingHint.Text" xml:space="preserve"><value>Changes apply to the next session.</value></data>
-  <data name="ReviewTitle.Text" xml:space="preserve"><value>Review fields</value></data>
   <data name="Review.Content" xml:space="preserve"><value>Review</value></data>
   <data name="Start.Content" xml:space="preserve"><value>Start</value></data>
   <data name="Stop.Content" xml:space="preserve"><value>Stop</value></data>
   <data name="Save.Content" xml:space="preserve"><value>Save</value></data>
   <data name="Save.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Save preferences</value></data>
-  <data name="Save.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve"><value>Saves the valid plan, theme and applied shortcut. Also saves when starting and closing; does not confirm the shortcut candidate.</value></data>
+  <data name="Save.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve"><value>Saves valid settings and the applied shortcut. Also saves when starting and closing.</value></data>
   <data name="CapturePrompt" xml:space="preserve"><value>Press the shortcut…</value></data>
   <data name="NextPlan" xml:space="preserve"><value>Next session: {0}</value></data>
   <data name="CurrentPlan" xml:space="preserve"><value>Current session: {0}</value></data>
@@ -88,7 +84,7 @@
   <data name="ReviewBeforeStart" xml:space="preserve"><value>Review the highlighted fields before starting.</value></data>
   <data name="CheckHotkeys" xml:space="preserve"><value>Check the shortcuts.</value></data>
   <data name="FinishingPrevious" xml:space="preserve"><value>Finishing the previous session…</value></data>
-  <data name="Interval" xml:space="preserve"><value>Base interval: {0:0.##} ms</value></data>
+  <data name="Interval" xml:space="preserve"><value>Interval: {0:0.##} ms</value></data>
   <data name="InvalidInterval" xml:space="preserve"><value>Invalid interval</value></data>
   <data name="Rate" xml:space="preserve"><value>Average sent rate: {0:0.0} clicks/s</value></data>
   <data name="Starting" xml:space="preserve"><value>Starting in {0:0} s…</value></data>
@@ -105,17 +101,12 @@
   <data name="PreparingHotkeys" xml:space="preserve"><value>Preparing shortcuts…</value></data>
   <data name="StartFailed" xml:space="preserve"><value>Could not start. Check the settings and try again.</value></data>
   <data name="StopFailed" xml:space="preserve"><value>Could not finish stopping. Exit the application.</value></data>
-  <data name="SaveFailed" xml:space="preserve"><value>Could not save preferences. Changes remain available for this session.</value></data>
+  <data name="SaveFailed" xml:space="preserve"><value>Could not save. Try again.</value></data>
   <data name="InvalidSettings" xml:space="preserve"><value>Review the settings before continuing.</value></data>
-  <data name="CaptureHint" xml:space="preserve"><value>Press a key or combination. Esc cancels; Ctrl+Shift+F10 remains reserved for emergencies.</value></data>
-  <data name="CapturedSimple" xml:space="preserve"><value>{0} captured. Single keys may interfere with typing. Click Apply to confirm.</value></data>
-  <data name="Captured" xml:space="preserve"><value>{0} captured. Click Apply to confirm.</value></data>
+  <data name="CaptureHint" xml:space="preserve"><value>Press a key or combination. Esc cancels.</value></data>
   <data name="HotkeyRegisterFailed" xml:space="preserve"><value>Could not register this combination. The previous shortcut was preserved.</value></data>
-  <data name="HotkeyApplying" xml:space="preserve"><value>{0} applied. Saving shortcut…</value></data>
-  <data name="HotkeyProtected" xml:space="preserve"><value>Shortcut applied for this session only. The protected preferences file was preserved.</value></data>
-  <data name="HotkeyTemporary" xml:space="preserve"><value>Shortcut applied for this session only.</value></data>
-  <data name="HotkeySaved" xml:space="preserve"><value>{0} applied and saved.</value></data>
-  <data name="HotkeySaveFailed" xml:space="preserve"><value>Shortcut applied for this session only. Could not save the combination.</value></data>
+  <data name="HotkeyProtected" xml:space="preserve"><value>The shortcut applies until you close the app. The preferences file is protected.</value></data>
+  <data name="HotkeySaveFailed" xml:space="preserve"><value>The shortcut could not be saved. It applies until you close the app.</value></data>
   <data name="IntegrationFailed" xml:space="preserve"><value>Could not prepare Windows integration. Reopen the application; starting is disabled.</value></data>
   <data name="TrayUnavailable" xml:space="preserve"><value>The system tray is unavailable. The window remains visible; try again shortly.</value></data>
   <data name="Plan" xml:space="preserve"><value>{0:0.##} clicks/s · {1} · {2}</value></data>
@@ -126,10 +117,9 @@
   <data name="Unlimited" xml:space="preserve"><value>No limits · No delay</value></data>
   <data name="NextOptions" xml:space="preserve"><value>Options for the next session</value></data>
   <data name="PreferencesProtected" xml:space="preserve"><value>Saving disabled · preferences protected.</value></data>
-  <data name="CorrectToSave" xml:space="preserve"><value>Correct the fields to save preferences.</value></data>
-  <data name="UnsavedFailure" xml:space="preserve"><value>Save failed · changes for this session only.</value></data>
-  <data name="Unsaved" xml:space="preserve"><value>Unsaved changes.</value></data>
-  <data name="Saved" xml:space="preserve"><value>Preferences saved.</value></data>
+  <data name="UnsavedFailure" xml:space="preserve"><value>Not saved</value></data>
+  <data name="Unsaved" xml:space="preserve"><value>Unsaved changes</value></data>
+  <data name="Saved" xml:space="preserve"><value>Saved</value></data>
   <data name="ChangeHotkey" xml:space="preserve"><value>Change shortcut</value></data>
   <data name="OperationUnavailable" xml:space="preserve"><value>Operation unavailable</value></data>
   <data name="Attention" xml:space="preserve"><value>Warning</value></data>
@@ -147,15 +137,23 @@
   <data name="SessionRelease" xml:space="preserve"><value>Could not release the button. Exit the application and check the mouse.</value></data>
   <data name="IntegrationClosed" xml:space="preserve"><value>Integration closed.</value></data>
   <data name="IntegrationFaulted" xml:space="preserve"><value>Windows integration failed. Exit and reopen the application.</value></data>
-  <data name="SessionProtectionUnavailable" xml:space="preserve"><value>Lock/disconnect protection unavailable (code {0}). Starting is disabled; reopen RM.AutoClicker.</value></data>
+  <data name="SessionProtectionUnavailable" xml:space="preserve"><value>Lock/disconnect protection unavailable (code {0}). Starting is disabled; reopen RM Auto Clicker.</value></data>
   <data name="TrayStatusUnavailable" xml:space="preserve"><value>{0} · System tray unavailable; the window will remain accessible.</value></data>
   <data name="TrayTip" xml:space="preserve"><value>RM Auto Clicker — {0} · {1} starts/stops · Ctrl+Shift+F10 stops</value></data>
   <data name="HotkeyConflict" xml:space="preserve"><value>{0} is unavailable (code {1}). Choose another combination. The previous shortcut was preserved.</value></data>
   <data name="HotkeyReleaseFailed" xml:space="preserve"><value>Could not unregister the previous key. The previous configuration was preserved.</value></data>
-  <data name="EmergencyConflict" xml:space="preserve"><value>Ctrl+Shift+F10 is unavailable. Close the application using this shortcut and reopen RM.AutoClicker.</value></data>
+  <data name="EmergencyConflict" xml:space="preserve"><value>Ctrl+Shift+F10 is unavailable. Close the application using this shortcut and reopen RM Auto Clicker.</value></data>
   <data name="HotkeyAvailable" xml:space="preserve"><value>{0} available</value></data>
   <data name="TrayOpen" xml:space="preserve"><value>Open RM Auto Clicker</value></data>
   <data name="TrayStop" xml:space="preserve"><value>Stop</value></data>
   <data name="TrayExit" xml:space="preserve"><value>Exit</value></data>
   <data name="SmokeLongNotice" xml:space="preserve"><value>Could not save preferences. Changes remain available for this session. Check the file before trying again; the session was not started and the previous settings were preserved.</value></data>
+  <data name="LanguagePending" xml:space="preserve"><value>Restart to apply the language.</value></data>
+  <data name="Review.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Review fields</value></data>
+  <data name="LimitsHint.Text" xml:space="preserve"><value>Stops when the first limit is reached.</value></data>
+  <data name="LanguagePendingActive" xml:space="preserve"><value>Restart to apply the language. The current session will end.</value></data>
+  <data name="TrayPreferenceSaveFailed" xml:space="preserve"><value>Could not save. Try again. The tray option was restored to its saved value.</value></data>
+  <data name="LanguagePicker.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve"><value>Number formats follow the Windows region.</value></data>
+  <data name="Variation.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve"><value>At 20%, a 100 ms interval varies from 80 to 120 ms. The observed rate depends on the system.</value></data>
+  <data name="LanguagePicker.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve"><value>Number formats follow the Windows region.</value></data>
 </root>

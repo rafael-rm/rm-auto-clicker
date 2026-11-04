@@ -55,10 +55,10 @@ public sealed class PresentationTests
         var clock = new Clock();
         var viewModel = Create(timeProvider: clock);
         await viewModel.SaveAsync();
-        Assert.Equal("Preferências salvas.", viewModel.SaveFeedback);
+        Assert.Equal("Salvo", viewModel.SaveFeedback);
         clock.Advance(TimeSpan.FromMilliseconds(2999));
         viewModel.Refresh();
-        Assert.Equal("Preferências salvas.", viewModel.SaveFeedback);
+        Assert.Equal("Salvo", viewModel.SaveFeedback);
         clock.Advance(TimeSpan.FromMilliseconds(1));
         viewModel.Refresh();
         Assert.Empty(viewModel.SaveFeedback);
@@ -74,7 +74,7 @@ public sealed class PresentationTests
         await viewModel.SaveAsync();
         clock.Advance(TimeSpan.FromMinutes(1));
         viewModel.Refresh();
-        Assert.StartsWith("Falha ao salvar", viewModel.SaveFeedback);
+        Assert.Equal("Não salvo", viewModel.SaveFeedback);
         Assert.True(viewModel.HasMessage);
         settings.FailSaving = false;
         await viewModel.SaveAsync();
@@ -82,7 +82,7 @@ public sealed class PresentationTests
         viewModel.ClicksPerSecond = 15;
         clock.Advance(TimeSpan.FromMinutes(1));
         viewModel.Refresh();
-        Assert.Equal("Alterações ainda não salvas.", viewModel.SaveFeedback);
+        Assert.Equal("Alterações não salvas", viewModel.SaveFeedback);
     }
 
     [Fact]
@@ -283,7 +283,7 @@ public sealed class PresentationTests
         settings.FailSaving = false;
         await viewModel.SaveAsync();
         Assert.False(viewModel.HasMessage);
-        Assert.Equal("Preferências salvas.", viewModel.SaveFeedback);
+        Assert.Equal("Salvo", viewModel.SaveFeedback);
         viewModel.ReportIntegrationFailure();
         await viewModel.SaveAsync();
         Assert.True(viewModel.IsMessageError);

@@ -22,6 +22,7 @@ internal sealed class SmokeHotkeys : IHotkeyService
 {
     public bool HotkeysReady => true;
     public bool EmergencyReady => true;
+    public bool HasStatusWarning => false;
     public string Status => "Simulated hotkey registration for smoke testing.";
 
     public bool TryChangeHotkey(HotkeyGesture hotkey, out string? error)

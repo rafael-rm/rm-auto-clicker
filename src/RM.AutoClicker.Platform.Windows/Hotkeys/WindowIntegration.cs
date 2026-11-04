@@ -24,6 +24,7 @@ public sealed class WindowIntegration : IHotkeyService, IDisposable
     private bool _hidden;
     private bool _windowMinimized;
     private bool _callbackFaulted;
+    private bool _hotkeyStatusWarning;
     private HotkeyGesture _toggleHotkey;
     private int _sessionError;
     private string _hotkeyStatus = string.Empty;
@@ -75,6 +76,7 @@ public sealed class WindowIntegration : IHotkeyService, IDisposable
 
     public bool HotkeysReady => !_disposed && _toggleRegistered && _emergencyRegistered && _sessionRegistered && !_callbackFaulted;
     public bool EmergencyReady => !_disposed && _emergencyRegistered;
+    public bool HasStatusWarning => _disposed || _callbackFaulted || !_sessionRegistered || !_trayAvailable || !_emergencyRegistered || _hotkeyStatusWarning;
     public string Status => _disposed ? _strings.Get("IntegrationClosed")
         : _callbackFaulted ? _strings.Get("IntegrationFaulted")
         : !_sessionRegistered ? _strings.Get("SessionProtectionUnavailable", _sessionError)
@@ -106,7 +108,9 @@ public sealed class WindowIntegration : IHotkeyService, IDisposable
 
         if (_toggleRegistered && _toggleHotkey == hotkey)
         {
-            error = null;
+            error = _emergencyRegistered ? null : _strings.Get("EmergencyConflict");
+            _hotkeyStatus = error ?? _strings.Get("HotkeyAvailable", GetDisplayName(hotkey));
+            _hotkeyStatusWarning = error is not null;
             return true;
         }
 
@@ -115,6 +119,7 @@ public sealed class WindowIntegration : IHotkeyService, IDisposable
         {
             error = _strings.Get("HotkeyConflict", GetDisplayName(hotkey), _api.LastError);
             _hotkeyStatus = error;
+            _hotkeyStatusWarning = true;
             return false;
         }
 
@@ -123,6 +128,7 @@ public sealed class WindowIntegration : IHotkeyService, IDisposable
             _api.UnregisterHotkey(_window, candidateId);
             error = _strings.Get("HotkeyReleaseFailed");
             _hotkeyStatus = error;
+            _hotkeyStatusWarning = true;
             return false;
         }
 
@@ -131,6 +137,7 @@ public sealed class WindowIntegration : IHotkeyService, IDisposable
         _toggleRegistered = true;
         error = _emergencyRegistered ? null : _strings.Get("EmergencyConflict");
         _hotkeyStatus = error ?? _strings.Get("HotkeyAvailable", GetDisplayName(hotkey));
+        _hotkeyStatusWarning = error is not null;
         if (_trayAvailable)
         {
             _trayAvailable = _api.UpdateTrayIcon(TrayTip);

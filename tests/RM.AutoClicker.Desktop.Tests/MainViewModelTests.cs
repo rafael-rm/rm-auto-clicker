@@ -321,7 +321,7 @@ public sealed class MainViewModelTests
 
         Assert.Equal(new HotkeyGesture(0x42), viewModel.Hotkey);
         Assert.Equal(0, settings.Saves);
-        Assert.Contains("somente nesta execução", viewModel.Message);
+        Assert.Equal(TestStrings.Portuguese.Get("HotkeyProtected"), viewModel.Message);
     }
 
     [Fact]
@@ -336,7 +336,7 @@ public sealed class MainViewModelTests
 
         Assert.Equal(new HotkeyGesture(0x42), viewModel.Hotkey);
         Assert.False(viewModel.HasHotkeyDraft);
-        Assert.Contains("somente nesta execução", viewModel.Message);
+        Assert.Equal(TestStrings.Portuguese.Get("HotkeySaveFailed"), viewModel.Message);
     }
 
     [Fact]
@@ -416,7 +416,7 @@ public sealed class MainViewModelTests
             Assert.False(applying.IsCompleted);
             Assert.False(model.LanguageSaveTask.IsCompleted);
             if (languageFirst) Assert.False(saving.IsCompleted);
-            Assert.DoesNotContain("Preferências salvas.", model.SaveFeedback);
+            Assert.NotEqual(TestStrings.Portuguese.Get("Saved"), model.SaveFeedback);
         }
         finally
         {
@@ -434,7 +434,7 @@ public sealed class MainViewModelTests
         Assert.Equal("es", settings.LastSaved?.Language);
         Assert.Equal(candidate, settings.LastSaved?.Hotkey);
         Assert.Equal(14, settings.LastSaved?.Plan?.ClicksPerSecond);
-        Assert.Equal("Preferências salvas.", model.SaveFeedback);
+        Assert.Equal(TestStrings.Portuguese.Get("Saved"), model.SaveFeedback);
         Assert.False(model.HasMessage);
     }
 

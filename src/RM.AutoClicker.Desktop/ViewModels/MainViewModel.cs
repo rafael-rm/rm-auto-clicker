@@ -166,6 +166,7 @@ public partial class MainViewModel : ObservableObject
         ? AppStrings.Preferences[LanguageIndex] : _savedSettings.Language;
     public bool LanguageChangePending => _savedSettings.Language != _initialLanguagePreference;
     public Task LanguageSaveTask { get; private set; } = Task.CompletedTask;
+    public string LanguageRestartMessage => _strings.Get(IsSessionActive ? "LanguagePendingActive" : "LanguagePending");
 
     [ObservableProperty]
     public partial string RestartError { get; set; } = string.Empty;
@@ -188,6 +189,7 @@ public partial class MainViewModel : ObservableObject
     }
 
     public bool HasMessage => !string.IsNullOrWhiteSpace(Message);
+    public bool HasHotkeyStatusWarning => _integration?.HasStatusWarning ?? true;
     public bool CanEditHotkey => !_shuttingDown && !_restarting && Snapshot.State is SessionState.Idle or SessionState.Faulted;
     public bool HasHotkeyDraft => IsCapturingHotkey || PendingHotkey is not null;
     public string HotkeyCaptureText => IsCapturingHotkey ? _strings.Get("CapturePrompt") : GetHotkeyName(PendingHotkey ?? Hotkey);
@@ -201,11 +203,12 @@ public partial class MainViewModel : ObservableObject
         : _strings.Get("HotkeyAccessible", AppliedHotkeyText);
     public string HotkeyOperationText => _integration?.EmergencyReady == true ? _strings.Get("EmergencyReady") : _strings.Get("EmergencyUnavailable");
     public string HotkeyEditHint => !CanEditHotkey ? _strings.Get("StopBeforeHotkey")
-        : Hotkey.Modifiers == HotkeyModifiers.None ? _strings.Get("SimpleKeyWarning") : string.Empty;
+        : HasHotkeyDraft && PendingHotkey is { Modifiers: HotkeyModifiers.None } ? _strings.Get("SimpleKeyWarning") : string.Empty;
     public bool HasHotkeyEditHint => !string.IsNullOrEmpty(HotkeyEditHint);
     public string AdvancedSummary => HasAdvancedErrors ? _strings.Get("ReviewOptions") : DescribeAdvancedPlan();
     public bool HasValidationError => !string.IsNullOrEmpty(ValidationMessage);
     public bool HasAdvancedErrors => !string.IsNullOrEmpty(DelayError + ClickLimitError + DurationLimitError + VariationError);
+    public bool ShowBothLimitsHint => HasClickLimit && HasDurationLimit;
     public string SpeedError => !double.IsFinite(ClicksPerSecond) || ClicksPerSecond is < 1 or > 25 ? _strings.Get("SpeedError") : string.Empty;
     public string MouseError => ButtonIndex is < 0 or > 2 ? _strings.Get("MouseError") : string.Empty;
     public string DelayError => HasInitialDelay && (!double.IsFinite(InitialDelaySeconds) || InitialDelaySeconds is < 0.1 or > 300) ? _strings.Get("DelayError", 0.1) : string.Empty;
@@ -575,14 +578,15 @@ public partial class MainViewModel : ObservableObject
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
-            ReportNotice("preferences", _strings.Get("SaveFailed"));
             _saveFailed = true;
-            if (requestedValue == MinimizeToTray)
+            var reverted = requestedValue == MinimizeToTray;
+            if (reverted)
             {
                 _loading = true;
                 MinimizeToTray = _savedSettings.MinimizeToTray;
                 _loading = false;
             }
+            ReportNotice("preferences", _strings.Get(reverted ? "TrayPreferenceSaveFailed" : "SaveFailed"));
             UpdateSaveFeedback();
             _writeDiagnostic("MinimizeToTraySaveFailed", exception);
         }
@@ -618,9 +622,7 @@ public partial class MainViewModel : ObservableObject
             candidate.Validate();
             PendingHotkey = candidate;
             IsCapturingHotkey = false;
-            HotkeyCaptureMessage = candidate.Modifiers == HotkeyModifiers.None
-                ? _strings.Get("CapturedSimple", GetHotkeyName(candidate))
-                : _strings.Get("Captured", GetHotkeyName(candidate));
+            HotkeyCaptureMessage = string.Empty;
         }
         catch (ArgumentException exception)
         {
@@ -644,12 +646,11 @@ public partial class MainViewModel : ObservableObject
 
         Hotkey = candidate;
         CancelHotkeyCapture();
-        HotkeyCaptureMessage = _strings.Get("HotkeyApplying", GetHotkeyName(candidate));
+        HotkeyCaptureMessage = string.Empty;
         Refresh();
         if (!_canSave)
         {
             ReportNotice("preferences", _strings.Get("HotkeyProtected"));
-            HotkeyCaptureMessage = _strings.Get("HotkeyTemporary");
             return;
         }
 
@@ -659,14 +660,14 @@ public partial class MainViewModel : ObservableObject
             var settings = _savedSettings with { Hotkey = Hotkey };
             await _settings.SaveAsync(settings);
             _savedSettings = settings;
-            HotkeyCaptureMessage = _strings.Get("HotkeySaved", GetHotkeyName(candidate));
+            HotkeyCaptureMessage = string.Empty;
             ClearNotice("preferences");
             ConfirmPreferencesSaved();
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
             ReportNotice("preferences", _strings.Get("HotkeySaveFailed"));
-            HotkeyCaptureMessage = _strings.Get("HotkeyTemporary");
+            HotkeyCaptureMessage = string.Empty;
             _writeDiagnostic("HotkeySaveFailed", exception);
         }
         finally
@@ -739,8 +740,8 @@ public partial class MainViewModel : ObservableObject
     private void UpdateSaveFeedback()
     {
         SaveFeedback = !_canSave ? _strings.Get("PreferencesProtected")
-            : !TryBuildPlan(out var plan, out _) ? _strings.Get("CorrectToSave")
             : _saveFailed ? _strings.Get("UnsavedFailure")
+            : !TryBuildPlan(out var plan, out _) ? string.Empty
             : plan != (_savedSettings.Plan ?? new ClickPlan()) || Hotkey != _savedSettings.EffectiveHotkey
                 || ThemeIndex != _savedSettings.ThemeIndex || HasInitialDelay != _savedSettings.HasInitialDelay
                 || MinimizeToTray != _savedSettings.MinimizeToTray
@@ -752,7 +753,7 @@ public partial class MainViewModel : ObservableObject
     private void RefreshPresentation()
     {
         StatusText = BuildStatusText();
-        foreach (var property in new[] { nameof(IsSessionActive), nameof(IsInputSuppressed), nameof(ShowPendingChanges), nameof(PendingChangesText),
+        foreach (var property in new[] { nameof(IsSessionActive), nameof(IsInputSuppressed), nameof(LanguageRestartMessage), nameof(HasHotkeyStatusWarning), nameof(ShowBothLimitsHint), nameof(ShowPendingChanges), nameof(PendingChangesText),
             nameof(ActivePlanText), nameof(HasSessionDetails), nameof(CurrentHotkeyText), nameof(AppliedHotkeyText), nameof(HotkeyAccessibleName), nameof(HotkeyOperationText), nameof(HotkeyEditHint),
             nameof(HasHotkeyEditHint), nameof(AdvancedSummary), nameof(HasValidationError), nameof(HasAdvancedErrors), nameof(SpeedError),
             nameof(MouseError), nameof(DelayError), nameof(ClickLimitError), nameof(DurationLimitError), nameof(VariationError), nameof(StartBlocker), nameof(HasStartBlocker), nameof(ShowStartBlocker), nameof(CanEmphasizeStart) })

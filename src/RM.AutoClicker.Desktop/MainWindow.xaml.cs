@@ -216,6 +216,7 @@ public sealed partial class MainWindow : Window
         Root.XamlRoot.Changed += (_, _) => ConfigureWindowBounds();
         ConfigureWindowBounds();
         UpdateSettingsViewport();
+        UpdateHotkeyEditorLayout();
     }
 
     private void OnWindowChanged(AppWindow sender, AppWindowChangedEventArgs args)
@@ -224,7 +225,26 @@ public sealed partial class MainWindow : Window
             ConfigureWindowBounds();
     }
 
-    private void OnLayoutSizeChanged(object sender, SizeChangedEventArgs args) => UpdateSettingsViewport();
+    private void OnLayoutSizeChanged(object sender, SizeChangedEventArgs args)
+    {
+        UpdateSettingsViewport();
+        UpdateHotkeyEditorLayout();
+    }
+
+    private void UpdateHotkeyEditorLayout()
+    {
+        if (Root.ActualWidth <= 0 || HotkeyEditorGrid.ActualWidth <= 0)
+            return;
+
+        var fontScale = Math.Max(1, CurrentHotkeyValue.FontSize / 14.0);
+        var inline = Root.ActualWidth >= 520 * fontScale;
+        Grid.SetRow(CurrentHotkeyValue, 0);
+        Grid.SetColumn(CurrentHotkeyValue, 0);
+        Grid.SetColumnSpan(CurrentHotkeyValue, inline ? 1 : 2);
+        Grid.SetRow(HotkeyCaptureButton, inline ? 0 : 1);
+        Grid.SetColumn(HotkeyCaptureButton, inline ? 1 : 0);
+        HotkeyCaptureButton.HorizontalAlignment = inline ? HorizontalAlignment.Stretch : HorizontalAlignment.Left;
+    }
 
     private void UpdateSettingsViewport()
     {
@@ -549,7 +569,7 @@ public sealed partial class MainWindow : Window
                 await Task.Delay(150);
                 Root.UpdateLayout();
                 if (!LanguageRestartNotice.IsOpen || !RestartAppButton.IsEnabled || RestartAppButton.ActualHeight <= 0
-                    || LanguageRestartNotice.Message != _strings.Get("LanguagePending.Message")
+                    || LanguageRestartNotice.Message != ViewModel.LanguageRestartMessage
                     || (string)RestartAppButton.Content != _strings.Get("RestartApp.Content"))
                     throw new InvalidOperationException("The language restart notice or action is not available inside Preferences.");
                 await File.WriteAllTextAsync(reportPath + ".restart-request.json", JsonSerializer.Serialize(new
@@ -727,15 +747,37 @@ public sealed partial class MainWindow : Window
                     var actionsFit = IsInsideRootHorizontally(StartButton) && IsInsideRootHorizontally(StopButton)
                         && IsInsideRootHorizontally(PreferencesButton) && AreSecondaryActionsVisible();
                     var titleBarActionsFit = AreTitleBarActionsAccessible();
+                    var hotkeyControlsFit = IsInsideRootHorizontally(CurrentHotkeyValue)
+                        && IsInsideRootHorizontally(HotkeyCaptureButton);
+                    var hotkeyDraftFits = true;
+                    if (!hasErrors)
+                    {
+                        try
+                        {
+                            ViewModel.BeginHotkeyCaptureCommand.Execute(null);
+                            ViewModel.CaptureHotkey(new HotkeyGesture(0x6B,
+                                HotkeyModifiers.Control | HotkeyModifiers.Alt | HotkeyModifiers.Shift));
+                            Root.UpdateLayout();
+                            hotkeyDraftFits = ViewModel.HasHotkeyDraft
+                                && IsInsideRootHorizontally(CurrentHotkeyValue)
+                                && IsInsideRootHorizontally(HotkeyCaptureButton)
+                                && IsInsideRootHorizontally(HotkeyDraftActions);
+                        }
+                        finally
+                        {
+                            ViewModel.CancelHotkeyCapture();
+                            Root.UpdateLayout();
+                        }
+                    }
                     _responsiveChecks.Add(new { Width = width, Height = height, FontScale = fontScale, HasErrors = hasErrors,
                         RootWidth = Root.ActualWidth, RootHeight = Root.ActualHeight, MouseColumn = Grid.GetColumn(MouseInput),
                         HeaderHeight = SessionHeader.ActualHeight, ProductNameHeight = ProductNameText.ActualHeight,
                         SpeedWidth = SpeedInput.ActualWidth, SettingsHeight = SettingsScroll.ActualHeight, FooterBottom = footerBottom,
                         SecondaryActionsVisible = AreSecondaryActionsVisible(), ActionsFit = actionsFit,
-                        WindowTitleBarActionsFit = titleBarActionsFit });
+                        WindowTitleBarActionsFit = titleBarActionsFit, HotkeyControlsFit = hotkeyControlsFit, HotkeyDraftFits = hotkeyDraftFits });
                     if (Grid.GetColumn(MouseInput) != (Root.ActualWidth >= 640 ? 1 : 0) || SpeedInput.ActualWidth < 100
                         || SettingsScroll.ActualHeight < 96 || footerBottom > Root.ActualHeight + 1 || !actionsFit
-                        || !titleBarActionsFit
+                        || !titleBarActionsFit || !hotkeyControlsFit || !hotkeyDraftFits
                         || SecondaryActions.Visibility != Visibility.Visible)
                         return false;
                     SettingsScroll.ChangeView(null, SettingsScroll.ScrollableHeight, null, true);
