@@ -9,7 +9,7 @@ public sealed class ClickSessionControllerTests
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
-    [InlineData(26)]
+    [InlineData(101)]
     [InlineData(double.NaN)]
     [InlineData(double.PositiveInfinity)]
     public async Task RejectsInvalidRate(double rate)
@@ -49,15 +49,20 @@ public sealed class ClickSessionControllerTests
         Assert.Equal(1, emitter.Releases);
     }
 
-    [Fact]
-    public async Task SendsExactlyTheRequestedNumberOfClicks()
+    [Theory]
+    [InlineData(10, 100)]
+    [InlineData(50, 20)]
+    [InlineData(100, 10)]
+    public async Task SendsExactlyTheRequestedNumberOfClicks(double rate, int intervalMilliseconds)
     {
         var clock = new TestClock();
         var emitter = new RecordingEmitter();
         await using var controller = new ClickSessionController(emitter, clock);
-        controller.Start(new(MaximumClicks: 3));
+        controller.Start(new(ClicksPerSecond: rate, MaximumClicks: 3));
 
-        clock.Advance(await clock.NextWaitAsync());
+        var firstWait = await clock.NextWaitAsync();
+        Assert.Equal(TimeSpan.FromMilliseconds(intervalMilliseconds), firstWait);
+        clock.Advance(firstWait);
         clock.Advance(await clock.NextWaitAsync());
         await controller.Completion.WaitAsync(TimeSpan.FromSeconds(5));
 

@@ -584,6 +584,8 @@ public sealed partial class MainWindow : Window
             FrameworkElement initialLastContent = AdvancedOptions;
             var initialContentBottom = initialLastContent.TransformToVisual(Root).TransformPoint(default).Y + initialLastContent.ActualHeight;
             var initialUnusedSpace = Math.Max(0, OperationFooter.TransformToVisual(Root).TransformPoint(default).Y - initialContentBottom);
+            var initialFooterSpacing = MeasureFooterSpacing();
+            var initialCompositionVerified = IsFooterBottomAligned();
             var initialActionsVisible = AreSecondaryActionsVisible();
             var numericInputEditingVerified = VerifyNumericInputEditing();
             var uncommittedNumericInputVerified = VerifyUncommittedNumericInput();
@@ -601,10 +603,10 @@ public sealed partial class MainWindow : Window
                 ProcessId = Environment.ProcessId,
                 Restarted = restarted,
                 RestartRequired = ViewModel.LanguageChangePending,
-                InitialCompositionVerified = initialUnusedSpace <= 16,
+                InitialCompositionVerified = initialCompositionVerified,
                 WindowSizingVerified = windowSizingVerified,
                 WindowSizingCheck = _windowSizingCheck,
-                InitialUnusedSpace = initialUnusedSpace,
+                InitialUnusedSpace = initialUnusedSpace, InitialFooterGapAbove = initialFooterSpacing.Above, InitialFooterGapBelow = initialFooterSpacing.Below,
                 InitialActionsVisible = initialActionsVisible,
                 AdvancedRevealVerified = advancedRevealVerified,
                 AdvancedRevealCheck = _advancedRevealCheck,
@@ -661,6 +663,19 @@ public sealed partial class MainWindow : Window
         }
     }
 
+    private (double Above, double Below) MeasureFooterSpacing()
+    {
+        var contentBottom = SettingsScroll.TransformToVisual(Root).TransformPoint(default).Y + SettingsScroll.ActualHeight;
+        var footerTop = OperationFooter.TransformToVisual(Root).TransformPoint(default).Y;
+        return (footerTop - contentBottom, Root.ActualHeight - footerTop - OperationFooter.ActualHeight);
+    }
+
+    private bool IsFooterBottomAligned()
+    {
+        var spacing = MeasureFooterSpacing();
+        return spacing.Above >= Layout.RowSpacing + OperationFooter.Margin.Top - 1
+            && Math.Abs(spacing.Below - Layout.Padding.Bottom) <= 1;
+    }
     private async Task<bool> VerifyWindowSizingAsync()
     {
         var originalSize = AppWindow.Size;
@@ -681,6 +696,7 @@ public sealed partial class MainWindow : Window
             var collapsedFooter = OperationFooter.TransformToVisual(Root).TransformPoint(default).Y;
             var collapsedGap = collapsedFooter - contentBottom;
             var collapsedActionsVisible = AreSecondaryActionsVisible();
+            var collapsedBottomAligned = IsFooterBottomAligned();
 
             AdvancedOptions.IsExpanded = true;
             await Task.Delay(350);
@@ -689,6 +705,7 @@ public sealed partial class MainWindow : Window
                 && OperationFooter.TransformToVisual(Root).TransformPoint(default).Y
                     + OperationFooter.ActualHeight <= Root.ActualHeight + 1;
 
+            var expandedBottomAligned = IsFooterBottomAligned();
             AdvancedOptions.IsExpanded = false;
             await Task.Delay(350);
             Root.UpdateLayout();
@@ -697,12 +714,12 @@ public sealed partial class MainWindow : Window
                 RequestedWidth = maximumWidth + 200, RequestedHeight = maximumHeight + 200,
                 ActualWidth = boundedSize.Width, ActualHeight = boundedSize.Height,
                 IsMaximizable = presenter.IsMaximizable, IsResizable = presenter.IsResizable,
-                CollapsedGap = collapsedGap, CollapsedActionsVisible = collapsedActionsVisible,
+                CollapsedGap = collapsedGap, CollapsedBottomAligned = collapsedBottomAligned, ExpandedBottomAligned = expandedBottomAligned, CollapsedActionsVisible = collapsedActionsVisible,
                 ExpandedActionsVisible = expandedActionsVisible, RestoredFooterDelta = Math.Abs(restoredFooter - collapsedFooter) };
 
             return !presenter.IsMaximizable && presenter.IsResizable
                 && boundedSize.Width <= maximumWidth && boundedSize.Height <= maximumHeight
-                && collapsedGap is >= 0 and <= 16 && Math.Abs(restoredFooter - collapsedFooter) <= 1
+                && collapsedBottomAligned && expandedBottomAligned && IsFooterBottomAligned() && Math.Abs(restoredFooter - collapsedFooter) <= 1
                 && collapsedActionsVisible && expandedActionsVisible && AppWindow.Size.Equals(boundedSize);
         }
         finally
@@ -747,6 +764,8 @@ public sealed partial class MainWindow : Window
                     var actionsFit = IsInsideRootHorizontally(StartButton) && IsInsideRootHorizontally(StopButton)
                         && IsInsideRootHorizontally(PreferencesButton) && AreSecondaryActionsVisible();
                     var titleBarActionsFit = AreTitleBarActionsAccessible();
+                    var footerBottomAligned = IsFooterBottomAligned();
+                    var footerSpacing = MeasureFooterSpacing();
                     var hotkeyControlsFit = IsInsideRootHorizontally(CurrentHotkeyValue)
                         && IsInsideRootHorizontally(HotkeyCaptureButton);
                     var hotkeyDraftFits = true;
@@ -774,10 +793,10 @@ public sealed partial class MainWindow : Window
                         HeaderHeight = SessionHeader.ActualHeight, ProductNameHeight = ProductNameText.ActualHeight,
                         SpeedWidth = SpeedInput.ActualWidth, SettingsHeight = SettingsScroll.ActualHeight, FooterBottom = footerBottom,
                         SecondaryActionsVisible = AreSecondaryActionsVisible(), ActionsFit = actionsFit,
-                        WindowTitleBarActionsFit = titleBarActionsFit, HotkeyControlsFit = hotkeyControlsFit, HotkeyDraftFits = hotkeyDraftFits });
+                        FooterBottomAligned = footerBottomAligned, FooterGapAbove = footerSpacing.Above, FooterGapBelow = footerSpacing.Below, WindowTitleBarActionsFit = titleBarActionsFit, HotkeyControlsFit = hotkeyControlsFit, HotkeyDraftFits = hotkeyDraftFits });
                     if (Grid.GetColumn(MouseInput) != (Root.ActualWidth >= 640 ? 1 : 0) || SpeedInput.ActualWidth < 100
                         || SettingsScroll.ActualHeight < 96 || footerBottom > Root.ActualHeight + 1 || !actionsFit
-                        || !titleBarActionsFit || !hotkeyControlsFit || !hotkeyDraftFits
+                        || !footerBottomAligned || !titleBarActionsFit || !hotkeyControlsFit || !hotkeyDraftFits
                         || SecondaryActions.Visibility != Visibility.Visible)
                         return false;
                     SettingsScroll.ChangeView(null, SettingsScroll.ScrollableHeight, null, true);
@@ -870,14 +889,14 @@ public sealed partial class MainWindow : Window
             var headerStable = SessionHeader.TransformToVisual(Root).TransformPoint(default).Y == headerPosition;
             var footerGap = OperationFooter.TransformToVisual(Root).TransformPoint(default).Y
                 - SettingsScroll.TransformToVisual(Root).TransformPoint(default).Y - SettingsScroll.ActualHeight;
-            var footerFollowsContent = footerGap >= 0 && footerGap <= Layout.RowSpacing + OperationFooter.Margin.Top + 1;
+            var footerBottomAligned = IsFooterBottomAligned();
             _advancedRevealCheck = new { ToggleVisible = toggleVisible, Offset = SettingsScroll.VerticalOffset,
                 ToggleY = InitialDelayToggle.TransformToVisual(SettingsScroll).TransformPoint(default).Y,
                 ToggleHeight = InitialDelayToggle.ActualHeight, SettingsHeight = SettingsScroll.ActualHeight,
                 RevealPending = _advancedRevealPending, ScrollableHeight = SettingsScroll.ScrollableHeight,
-                SizeUnchanged = sizeUnchanged, HeaderStable = headerStable, FooterFollowsContent = footerFollowsContent, FooterGap = footerGap };
+                SizeUnchanged = sizeUnchanged, HeaderStable = headerStable, FooterBottomAligned = footerBottomAligned, FooterGap = footerGap };
             return toggleVisible && SettingsScroll.VerticalOffset > 0 && AreSecondaryActionsVisible()
-                && sizeUnchanged && headerStable && footerFollowsContent;
+                && sizeUnchanged && headerStable && footerBottomAligned;
         }
         finally
         {

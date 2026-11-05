@@ -17,7 +17,7 @@ O aplicativo é distribuído em um único EXE para **Windows 10 ou 11 de 64 bits
 
 ## Recursos
 
-- Velocidade de **1 a 25 cliques por segundo**.
+- Velocidade de **1 a 100 cliques por segundo**.
 - Clique com o botão esquerdo, direito ou do meio.
 - Atalho de iniciar/parar personalizável, com combinações de Ctrl, Alt e Shift.
 - Opções avançadas de atraso inicial, limite de cliques, limite de tempo e variação do intervalo.

@@ -120,6 +120,31 @@ public sealed class MinimalPresentationTests
         await model.SaveAsync();
         Assert.Equal(strings.Get("Saved"), model.SaveFeedback);
     }
+    [Theory]
+    [InlineData("pt-BR")]
+    [InlineData("en-US")]
+    [InlineData("es")]
+    public void AdvancedSummaryExplainsDefaultsAndSurvivesInvalidBasicInput(string language)
+    {
+        var strings = TestStrings.Create(language);
+        var model = CreateModel(new Controller(), language);
+        Assert.Equal(strings.Get("AdvancedDescription"), model.AdvancedSummary);
+
+        model.HasClickLimit = true;
+        model.MaximumClicks = 100;
+        var configured = strings.Get("PlanClicks", 100L);
+        Assert.Equal(configured, model.AdvancedSummary);
+
+        model.ClicksPerSecond = double.NaN;
+        Assert.True(model.HasValidationError);
+        Assert.Equal(configured, model.AdvancedSummary);
+
+        model.MaximumClicks = double.NaN;
+        Assert.Equal(strings.Get("ReviewOptions"), model.AdvancedSummary);
+
+        model.HasClickLimit = false;
+        Assert.Equal(strings.Get("AdvancedDescription"), model.AdvancedSummary);
+    }
     private static MainViewModel CreateModel(Controller controller, string language = "pt-BR") =>
         new(TestStrings.Create(language), controller, new Settings(language), false, writeDiagnostic: (_, _) => { });
 

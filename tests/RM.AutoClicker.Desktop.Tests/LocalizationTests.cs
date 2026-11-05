@@ -87,9 +87,9 @@ public sealed class LocalizationTests
     }
 
     [Theory]
-    [InlineData("pt-BR", "De 1 a 25", "Reiniciar agora")]
-    [InlineData("en-US", "From 1 to 25", "Restart now")]
-    [InlineData("es", "De 1 a 25", "Reiniciar ahora")]
+    [InlineData("pt-BR", "De 1 a 100", "Reiniciar agora")]
+    [InlineData("en-US", "From 1 to 100", "Restart now")]
+    [InlineData("es", "De 1 a 100", "Reiniciar ahora")]
     public void LocalizesRestartActionAndKeepsOnlyTheSpeedRange(string language, string range, string restart)
     {
         var strings = TestStrings.Create(language);

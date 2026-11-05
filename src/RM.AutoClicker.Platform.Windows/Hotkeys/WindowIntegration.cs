@@ -83,7 +83,7 @@ public sealed class WindowIntegration : IHotkeyService, IDisposable
         : !_trayAvailable ? _strings.Get("TrayStatusUnavailable", _hotkeyStatus)
         : _hotkeyStatus;
 
-    private string TrayTip => _strings.Get("TrayTip", _sessionStatus, GetDisplayName(_toggleHotkey));
+    private string TrayTip => _strings.Get("TrayTip", GetDisplayName(_toggleHotkey));
 
     public void UpdateSessionStatus(string status)
     {

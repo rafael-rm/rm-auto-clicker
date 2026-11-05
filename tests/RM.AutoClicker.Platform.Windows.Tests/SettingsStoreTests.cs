@@ -21,7 +21,7 @@ public sealed class SettingsStoreTests : IDisposable
     public async Task RoundTripsAnImmutablePlanAndPreferences()
     {
         var store = new SettingsStore(_directory);
-        var settings = new AppSettings(Plan: new(ClicksPerSecond: 12, VariationPercent: 20, Button: ClickButton.Right,
+        var settings = new AppSettings(Plan: new(ClicksPerSecond: 100, VariationPercent: 20, Button: ClickButton.Right,
             InitialDelay: TimeSpan.FromSeconds(2), MaximumClicks: 100, MaximumDuration: TimeSpan.FromSeconds(20)),
             Hotkey: new(0x41, HotkeyModifiers.Control | HotkeyModifiers.Alt), ThemeIndex: 2, HasInitialDelay: true);
 

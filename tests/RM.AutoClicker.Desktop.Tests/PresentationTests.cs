@@ -239,7 +239,7 @@ public sealed class PresentationTests
     public void AdvancedSummaryOnlyIncludesEnabledAndValidOptions()
     {
         var viewModel = Create();
-        Assert.Equal("Sem limites · Sem atraso", viewModel.AdvancedSummary);
+        Assert.Equal(TestStrings.Portuguese.Get("AdvancedDescription"), viewModel.AdvancedSummary);
         viewModel.HasInitialDelay = true;
         viewModel.HasClickLimit = true;
         viewModel.HasDurationLimit = true;

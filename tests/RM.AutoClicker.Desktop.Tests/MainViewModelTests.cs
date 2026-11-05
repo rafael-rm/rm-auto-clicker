@@ -33,7 +33,7 @@ public sealed class MainViewModelTests
     [InlineData(double.PositiveInfinity)]
     [InlineData(double.NegativeInfinity)]
     [InlineData(0)]
-    [InlineData(26)]
+    [InlineData(101)]
     public void InvalidNumericInputNeverReachesSlider(double value)
     {
         var viewModel = CreateViewModel();
@@ -56,7 +56,7 @@ public sealed class MainViewModelTests
     [InlineData(double.PositiveInfinity)]
     [InlineData(double.NegativeInfinity)]
     [InlineData(0)]
-    [InlineData(26)]
+    [InlineData(101)]
     public void SliderRejectsInvalidAssignments(double value)
     {
         var viewModel = CreateViewModel();
@@ -72,6 +72,10 @@ public sealed class MainViewModelTests
     [InlineData(1)]
     [InlineData(12.5)]
     [InlineData(25)]
+    [InlineData(26)]
+    [InlineData(50)]
+    [InlineData(51)]
+    [InlineData(100)]
     public void ValidInputUpdatesSliderAndRecoversFromEmptyValue(double value)
     {
         var viewModel = CreateViewModel();

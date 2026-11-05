@@ -12,8 +12,8 @@ public sealed record ClickPlan(
 
     public void Validate()
     {
-        if (!double.IsFinite(ClicksPerSecond) || ClicksPerSecond is < 1 or > 25)
-            throw new ArgumentOutOfRangeException(nameof(ClicksPerSecond), "Speed must be between 1 and 25 clicks/s.");
+        if (!double.IsFinite(ClicksPerSecond) || ClicksPerSecond is < 1 or > 100)
+            throw new ArgumentOutOfRangeException(nameof(ClicksPerSecond), "Speed must be between 1 and 100 clicks/s.");
 
         if (!double.IsFinite(VariationPercent) || VariationPercent is < 0 or > 50)
             throw new ArgumentOutOfRangeException(nameof(VariationPercent), "Variation must be between 0 and 50%.");

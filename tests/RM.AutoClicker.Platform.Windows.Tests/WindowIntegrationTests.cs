@@ -376,9 +376,7 @@ public sealed class WindowIntegrationTests
         integration.UpdateSessionStatus("Executando");
         integration.UpdateSessionStatus("Executando");
         Assert.Single(api.TrayTips);
-        Assert.Contains("Executando", api.TrayTips[0]);
-        Assert.Contains("F8", api.TrayTips[0]);
-        Assert.Contains("Ctrl+Shift+F10", api.TrayTips[0]);
+        Assert.Equal("RM Auto Clicker · F8", api.TrayTips[0]);
     }
 
     [Fact]

@@ -183,7 +183,7 @@ public partial class MainViewModel : ObservableObject
         get => _sliderClicksPerSecond;
         set
         {
-            if (double.IsFinite(value) && value is >= 1 and <= 25)
+            if (double.IsFinite(value) && value is >= 1 and <= 100)
                 ClicksPerSecond = value;
         }
     }
@@ -209,7 +209,7 @@ public partial class MainViewModel : ObservableObject
     public bool HasValidationError => !string.IsNullOrEmpty(ValidationMessage);
     public bool HasAdvancedErrors => !string.IsNullOrEmpty(DelayError + ClickLimitError + DurationLimitError + VariationError);
     public bool ShowBothLimitsHint => HasClickLimit && HasDurationLimit;
-    public string SpeedError => !double.IsFinite(ClicksPerSecond) || ClicksPerSecond is < 1 or > 25 ? _strings.Get("SpeedError") : string.Empty;
+    public string SpeedError => !double.IsFinite(ClicksPerSecond) || ClicksPerSecond is < 1 or > 100 ? _strings.Get("SpeedError") : string.Empty;
     public string MouseError => ButtonIndex is < 0 or > 2 ? _strings.Get("MouseError") : string.Empty;
     public string DelayError => HasInitialDelay && (!double.IsFinite(InitialDelaySeconds) || InitialDelaySeconds is < 0.1 or > 300) ? _strings.Get("DelayError", 0.1) : string.Empty;
     public string ClickLimitError => HasClickLimit && (!double.IsFinite(MaximumClicks) || MaximumClicks < 1 || MaximumClicks > 1_000_000_000 || MaximumClicks != Math.Truncate(MaximumClicks)) ? _strings.Get("ClickLimitError") : string.Empty;
@@ -500,7 +500,7 @@ public partial class MainViewModel : ObservableObject
 
     partial void OnClicksPerSecondChanged(double value)
     {
-        if (double.IsFinite(value) && value is >= 1 and <= 25 && _sliderClicksPerSecond != value)
+        if (double.IsFinite(value) && value is >= 1 and <= 100 && _sliderClicksPerSecond != value)
         {
             _sliderClicksPerSecond = value;
             OnPropertyChanged(nameof(SliderClicksPerSecond));
@@ -726,7 +726,15 @@ public partial class MainViewModel : ObservableObject
         return options.Count == 0 ? _strings.Get("Unlimited") : string.Join(" · ", options);
     }
 
-    private string DescribeAdvancedPlan() => TryBuildPlan(out var plan, out _) ? DescribeAdvanced(plan!) : _strings.Get("NextOptions");
+    private string DescribeAdvancedPlan()
+    {
+        var options = new List<string>();
+        if (HasInitialDelay) options.Add(_strings.Get("PlanDelay", InitialDelaySeconds));
+        if (HasClickLimit) options.Add(_strings.Get("PlanClicks", (long)MaximumClicks));
+        if (HasDurationLimit) options.Add(_strings.Get("PlanDuration", MaximumDurationSeconds));
+        if (VariationPercent > 0) options.Add(_strings.Get("PlanVariation", VariationPercent));
+        return options.Count == 0 ? _strings.Get("AdvancedDescription") : string.Join(" · ", options);
+    }
 
     private void ConfirmPreferencesSaved()
     {

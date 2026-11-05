@@ -90,7 +90,7 @@ foreach ($run in 1..2) {
         throw 'The report does not confirm a successful startup without clicks.'
     }
     if (-not $report.WindowSizingVerified) {
-        throw 'The window size limits or compact footer layout were not verified.'
+        throw 'The window size limits or bottom-aligned footer layout were not verified.'
     }
     if (-not $report.WindowTitleBarVerified) {
         throw 'The custom title bar controls overlap or are missing accessible names.'

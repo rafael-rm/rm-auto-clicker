@@ -30,8 +30,8 @@
   <data name="BasicTitle.Text" xml:space="preserve"><value>Configurações básicas</value></data>
   <data name="Speed.Header" xml:space="preserve"><value>Velocidade (cliques/s)</value></data>
   <data name="Speed.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Cliques por segundo</value></data>
-  <data name="SpeedSliderLabel.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Ajustar cliques por segundo de 1 a 25</value></data>
-  <data name="SpeedHint.Text" xml:space="preserve"><value>De 1 a 25</value></data>
+  <data name="SpeedSliderLabel.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Ajustar cliques por segundo de 1 a 100</value></data>
+  <data name="SpeedHint.Text" xml:space="preserve"><value>De 1 a 100</value></data>
   <data name="Mouse.Header" xml:space="preserve"><value>Botão do mouse</value></data>
   <data name="MouseLeft" xml:space="preserve"><value>Esquerdo</value></data>
   <data name="MouseRight" xml:space="preserve"><value>Direito</value></data>
@@ -73,7 +73,7 @@
   <data name="StopBeforeHotkey" xml:space="preserve"><value>Pare a sessão para alterar o atalho.</value></data>
   <data name="SimpleKeyWarning" xml:space="preserve"><value>Teclas simples podem interferir na digitação de outros aplicativos.</value></data>
   <data name="ReviewOptions" xml:space="preserve"><value>Revisar opções</value></data>
-  <data name="SpeedError" xml:space="preserve"><value>Informe uma velocidade entre 1 e 25 cliques/s.</value></data>
+  <data name="SpeedError" xml:space="preserve"><value>Informe uma velocidade entre 1 e 100 cliques/s.</value></data>
   <data name="MouseError" xml:space="preserve"><value>Selecione um botão do mouse.</value></data>
   <data name="DelayError" xml:space="preserve"><value>Informe um atraso entre {0} e 300 segundos.</value></data>
   <data name="ClickLimitError" xml:space="preserve"><value>Informe um inteiro entre 1 e 1 bilhão de cliques.</value></data>
@@ -139,7 +139,7 @@
   <data name="IntegrationFaulted" xml:space="preserve"><value>Falha na integração Windows. Encerre e reabra o aplicativo.</value></data>
   <data name="SessionProtectionUnavailable" xml:space="preserve"><value>Proteção de bloqueio/desconexão indisponível (código {0}). O início está desabilitado; reabra o RM Auto Clicker.</value></data>
   <data name="TrayStatusUnavailable" xml:space="preserve"><value>{0} · Bandeja indisponível; a janela permanecerá acessível.</value></data>
-  <data name="TrayTip" xml:space="preserve"><value>RM Auto Clicker — {0} · {1} inicia/para · Ctrl+Shift+F10 para</value></data>
+  <data name="TrayTip" xml:space="preserve"><value>RM Auto Clicker · {0}</value></data>
   <data name="HotkeyConflict" xml:space="preserve"><value>{0} está indisponível (código {1}). Escolha outra combinação. O atalho anterior foi preservado.</value></data>
   <data name="HotkeyReleaseFailed" xml:space="preserve"><value>Não foi possível liberar a tecla anterior. A configuração anterior foi preservada.</value></data>
   <data name="EmergencyConflict" xml:space="preserve"><value>Ctrl+Shift+F10 está indisponível. Feche o aplicativo que usa esse atalho e reabra o RM Auto Clicker.</value></data>
@@ -156,4 +156,5 @@
   <data name="LanguagePicker.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve"><value>Os formatos numéricos seguem a região do Windows.</value></data>
   <data name="Variation.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve"><value>Com 20%, um intervalo de 100 ms varia entre 80 e 120 ms. A taxa observada depende do sistema.</value></data>
   <data name="LanguagePicker.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve"><value>Os formatos numéricos seguem a região do Windows.</value></data>
+  <data name="AdvancedDescription" xml:space="preserve"><value>Contagem regressiva, limites e variação</value></data>
 </root>

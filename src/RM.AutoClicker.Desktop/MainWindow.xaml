@@ -25,6 +25,11 @@
                             <Setter Target="SecondaryActions.(Grid.Row)" Value="0" />
                             <Setter Target="SecondaryActions.HorizontalAlignment" Value="Right" />
                             <Setter Target="SecondaryActions.Margin" Value="0" />
+                            <Setter Target="SaveFeedbackText.(Grid.Row)" Value="0" />
+                            <Setter Target="SaveFeedbackText.(Grid.Column)" Value="1" />
+                            <Setter Target="SaveFeedbackText.(Grid.ColumnSpan)" Value="1" />
+                            <Setter Target="SaveFeedbackText.Margin" Value="0" />
+                            <Setter Target="EmergencyCaption.(Grid.ColumnSpan)" Value="1" />
                         </VisualState.Setters>
                     </VisualState>
                 </VisualStateGroup>
@@ -49,9 +54,9 @@
                 </Button>
             </StackPanel>
         </Grid>
-        <Grid x:Name="Layout" Grid.Row="1" Padding="16,14,16,20" RowSpacing="4" MaxWidth="880" HorizontalAlignment="Stretch" VerticalAlignment="Top">
-            <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
-            <StackPanel x:Name="SessionHeader" Spacing="8">
+        <Grid x:Name="Layout" Grid.Row="1" Padding="16,14,16,18" RowSpacing="8" MaxWidth="880" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+            <StackPanel x:Name="SessionHeader" Spacing="12">
                 <Grid ColumnSpacing="12">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                     <TextBlock x:Name="ProductNameText" Text="RM Auto Clicker" Style="{ThemeResource BodyStrongTextBlockStyle}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
@@ -103,7 +108,7 @@
 
             </StackPanel>
             <ScrollViewer x:Name="SettingsScroll" Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-                <StackPanel Spacing="8" Padding="0,0,4,4">
+                <StackPanel Spacing="8" Padding="0,0,0,4">
                 <InfoBar IsOpen="{x:Bind ViewModel.HasMessage, Mode=OneWay}" Visibility="{x:Bind ToVisibility(ViewModel.HasMessage), Mode=OneWay}" IsClosable="False" Severity="{x:Bind NoticeSeverity(ViewModel.IsMessageError), Mode=OneWay}" Title="{x:Bind NoticeTitle(ViewModel.IsMessageError), Mode=OneWay}" Message="{x:Bind ViewModel.Message, Mode=OneWay}" />
                 <StackPanel Spacing="4" Visibility="{x:Bind ToVisibility(ViewModel.HasSessionDetails), Mode=OneWay}">
                     <TextBlock x:Uid="RateHint" Text="{x:Bind ViewModel.RateText, Mode=OneWay}" Visibility="{x:Bind TextVisibility(ViewModel.RateText), Mode=OneWay}" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Style="{ThemeResource CaptionTextBlockStyle}" />
@@ -125,9 +130,9 @@
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
                             <StackPanel Spacing="6">
-                                <controls:AutoDismissNumberBox x:Uid="Speed" x:Name="SpeedInput" Value="{x:Bind ViewModel.ClicksPerSecond, Mode=TwoWay}" Minimum="1" Maximum="25" SmallChange="1" SpinButtonPlacementMode="Compact" AutomationProperties.HelpText="{x:Bind ViewModel.SpeedError, Mode=OneWay}" />
+                                <controls:AutoDismissNumberBox x:Uid="Speed" x:Name="SpeedInput" Value="{x:Bind ViewModel.ClicksPerSecond, Mode=TwoWay}" Minimum="1" Maximum="100" SmallChange="1" SpinButtonPlacementMode="Compact" AutomationProperties.HelpText="{x:Bind ViewModel.SpeedError, Mode=OneWay}" />
                                 <TextBlock Text="{x:Bind ViewModel.SpeedError, Mode=OneWay}" Visibility="{x:Bind TextVisibility(ViewModel.SpeedError), Mode=OneWay}" TextWrapping="Wrap" Foreground="{ThemeResource SystemFillColorCriticalBrush}" AutomationProperties.LiveSetting="Polite" />
-                                <Slider x:Uid="SpeedSliderLabel" x:Name="SpeedSlider" Minimum="1" Maximum="25" StepFrequency="0.5" Value="{x:Bind ViewModel.SliderClicksPerSecond, Mode=TwoWay}" />
+                                <Slider x:Uid="SpeedSliderLabel" x:Name="SpeedSlider" Minimum="1" Maximum="100" StepFrequency="0.5" Value="{x:Bind ViewModel.SliderClicksPerSecond, Mode=TwoWay}" />
                                 <TextBlock x:Uid="SpeedHint" TextWrapping="Wrap" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                 <TextBlock Text="{x:Bind ViewModel.IntervalText, Mode=OneWay}" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                             </StackPanel>
@@ -154,7 +159,7 @@
                     </StackPanel>
                 </Border>
 
-                <Expander x:Uid="Advanced" x:Name="AdvancedOptions" IsExpanded="False" Expanding="OnAdvancedExpanding" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                <Expander x:Uid="Advanced" x:Name="AdvancedOptions" MinHeight="60" IsExpanded="False" Expanding="OnAdvancedExpanding" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
                     <Expander.Header><StackPanel Spacing="4"><TextBlock x:Uid="AdvancedTitle" Style="{ThemeResource BodyStrongTextBlockStyle}" /><TextBlock Text="{x:Bind ViewModel.AdvancedSummary, Mode=OneWay}" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}" /></StackPanel></Expander.Header>
                     <StackPanel Spacing="20">
                         <StackPanel Spacing="8">
@@ -201,7 +206,7 @@
                 </Expander>
                 </StackPanel>
             </ScrollViewer>
-            <StackPanel x:Name="OperationFooter" Grid.Row="2" Margin="0,4,0,0" Spacing="2">
+            <StackPanel x:Name="OperationFooter" Grid.Row="2" Margin="0,6,0,0" Spacing="2" VerticalAlignment="Bottom">
                 <TextBlock x:Uid="PendingHint" Visibility="{x:Bind ToVisibility(ViewModel.ShowPendingChanges), Mode=OneWay}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite" />
                 <Grid Visibility="{x:Bind ToVisibility(ViewModel.HasValidationError), Mode=OneWay}" ColumnSpacing="12">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
@@ -218,10 +223,14 @@
                     <Grid x:Name="SecondaryActions" Grid.Row="1" Grid.ColumnSpan="2" ColumnSpacing="8" Margin="0,4,0,0">
                         <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                         <Button x:Uid="Save" x:Name="SavePreferencesButton" Grid.Column="1" Command="{x:Bind ViewModel.SaveCommand}" MinWidth="100" />
-                        <TextBlock x:Name="SaveFeedbackText" Grid.Column="0" Text="{x:Bind ViewModel.SaveFeedback, Mode=OneWay}" Visibility="{x:Bind TextVisibility(ViewModel.SaveFeedback), Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" AutomationProperties.LiveSetting="Polite" ToolTipService.ToolTip="{x:Bind ViewModel.SaveFeedback, Mode=OneWay}" />
                     </Grid>
                 </Grid>
-                <TextBlock Text="{x:Bind ViewModel.HotkeyOperationText, Mode=OneWay}" TextWrapping="Wrap" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                <Grid Margin="0,2,0,0" ColumnSpacing="12">
+                    <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                    <TextBlock x:Name="EmergencyCaption" Grid.ColumnSpan="2" Text="{x:Bind ViewModel.HotkeyOperationText, Mode=OneWay}" TextWrapping="Wrap" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <TextBlock x:Name="SaveFeedbackText" Grid.Row="1" Grid.ColumnSpan="2" Margin="0,4,0,0" Text="{x:Bind ViewModel.SaveFeedback, Mode=OneWay}" Visibility="{x:Bind TextVisibility(ViewModel.SaveFeedback), Mode=OneWay}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Right" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" AutomationProperties.LiveSetting="Polite" ToolTipService.ToolTip="{x:Bind ViewModel.SaveFeedback, Mode=OneWay}" />
+                </Grid>
             </StackPanel>
         </Grid>
     </Grid>
