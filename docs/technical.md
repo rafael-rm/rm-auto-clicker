@@ -15,7 +15,7 @@ Referência da implementação atual. Para instruções de uso, consulte o [READ
 | Plataforma mínima declarada no Desktop | `10.0.17763.0` |
 | Scripts | PowerShell 7 no Windows |
 | Solução | [RM.AutoClicker.slnx](../RM.AutoClicker.slnx) |
-| Versão do produto | `1.0.0`, definida em [Directory.Build.props](../Directory.Build.props) |
+| Versão do produto | `1.1.0`, definida em [Directory.Build.props](../Directory.Build.props) |
 
 Os pacotes diretos estão em [Directory.Packages.props](../Directory.Packages.props). Cada projeto mantém seu `packages.lock.json`. A primeira restauração requer acesso aos feeds NuGet; as compilações e os testes da solução devem ser executados no Windows.
 
@@ -317,13 +317,13 @@ Não há incremento automático de versão, criação automática de tags ou sob
 
 Alterações de versão também podem atualizar referências de projetos nos lockfiles. Faça restore com `--force-evaluate`, revise o resultado e valide novamente com `--locked-mode`.
 
-O responsável pelo repositório deve revisar e enviar as alterações, aprovar o pacote e então criar/enviar a tag. Exemplo para uma versão definida como `1.0.0`:
+O responsável pelo repositório deve revisar e enviar as alterações, aprovar o pacote e então criar/enviar a tag. Exemplo para a versão `1.1.0`:
 
 ```powershell
 git switch master
 git pull --ff-only
-git tag -a v1.0.0 -m "RM Auto Clicker 1.0.0"
-git push origin v1.0.0
+git tag -a v1.1.0 -m "RM Auto Clicker 1.1.0"
+git push origin v1.1.0
 ```
 
 Esses comandos são um procedimento de publicação, não parte do build local. Antes de utilizá-los, o remoto deve estar configurado e a tag precisa estar disponível.

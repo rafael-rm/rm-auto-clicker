@@ -93,7 +93,7 @@
       "rm.autoclicker.platform.windows": {
         "type": "Project",
         "dependencies": {
-          "RM.AutoClicker.Core": "[1.0.0, )"
+          "RM.AutoClicker.Core": "[1.1.0, )"
         }
       }
     }

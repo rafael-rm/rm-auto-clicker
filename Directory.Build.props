@@ -7,7 +7,7 @@
     <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisLevel>latest</AnalysisLevel>
-    <Version>1.0.0</Version>
+    <Version>1.1.0</Version>
     <Product>RM Auto Clicker</Product>
   </PropertyGroup>
 </Project>
