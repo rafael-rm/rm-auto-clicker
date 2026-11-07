@@ -6,12 +6,14 @@ using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using RM.AutoClicker.Core.Abstractions;
 using RM.AutoClicker.Core.Execution;
 using RM.AutoClicker.Desktop.Localization;
 using System.Globalization;
+using Windows.Foundation;
 using RM.AutoClicker.Core.Models;
 using RM.AutoClicker.Desktop.ViewModels;
 using RM.AutoClicker.Platform.Windows.Hotkeys;
@@ -25,6 +27,9 @@ namespace RM.AutoClicker.Desktop;
 
 public sealed partial class MainWindow : Window
 {
+    private const int WindowWidth = 750;
+    private const int WindowHeight = 650;
+
     private readonly IAppStrings _strings;
     private readonly ClickSessionController _controller;
     private readonly WindowIntegration? _integration;
@@ -42,6 +47,12 @@ public sealed partial class MainWindow : Window
     private object? _numericPopupDismissalCheck;
     private bool _advancedRevealPending;
     private int _advancedRevealVersion;
+    private readonly WindowMenuSubclassProcedure _windowMenuProcedure;
+    private bool _windowMenuSubclassAttached;
+    private MenuFlyout? _windowMenuFlyout;
+
+    private delegate nint WindowMenuSubclassProcedure(nint window, uint message, nuint parameter,
+        nint detail, nuint subclassId, nuint referenceData);
 
     public MainWindow(IAppStrings strings, ISettingsStore settings, SettingsLoadResult loadedSettings,
         bool smokeTest = false, bool testIntegration = false)
@@ -51,6 +62,7 @@ public sealed partial class MainWindow : Window
         _smokeEmitter = smokeTest ? new SmokeInputEmitter() : null;
         _controller = new ClickSessionController(_smokeEmitter is { } smokeEmitter ? smokeEmitter : new WindowsInputEmitter());
         ViewModel = new MainViewModel(strings, _controller, settings, smokeTest, loadedSettings: loadedSettings);
+        _windowMenuProcedure = HandleWindowMenuMessage;
         ViewModel.RestartRequested += () =>
         {
             var arguments = _smokeTest ? "--smoke-test --smoke-restart --smoke-restarted" : string.Empty;
@@ -71,7 +83,7 @@ public sealed partial class MainWindow : Window
         ConfigureWindowBounds();
         var scale = GetWindowScale();
         var workArea = DisplayArea.GetFromWindowId(AppWindow.Id, DisplayAreaFallback.Primary).WorkArea;
-        AppWindow.Resize(new SizeInt32(Math.Min((int)(760 * scale), workArea.Width), Math.Min((int)(650 * scale), workArea.Height)));
+        AppWindow.Resize(new SizeInt32(Math.Min((int)(WindowWidth * scale), workArea.Width), Math.Min((int)(WindowHeight * scale), workArea.Height)));
         Root.Loaded += OnWindowLoaded;
         Root.SizeChanged += OnLayoutSizeChanged;
         AppTitleBar.SizeChanged += OnLayoutSizeChanged;
@@ -146,6 +158,10 @@ public sealed partial class MainWindow : Window
         if (AppWindow.Presenter is OverlappedPresenter presenter)
             presenter.SetBorderAndTitleBar(hasBorder: true, hasTitleBar: false);
         SetTitleBar(TitleBarDragRegion);
+        InitializeWindowSystemMenu();
+        _windowMenuSubclassAttached = SetWindowSubclass(WindowNativeHandle(), _windowMenuProcedure, 2, 0);
+        if (!_windowMenuSubclassAttached)
+            AppDiagnostics.Write("WindowMenuSubclassFailed", new System.ComponentModel.Win32Exception(Marshal.GetLastPInvokeError()));
         _themeSettings = Microsoft.UI.System.ThemeSettings.CreateForWindowId(AppWindow.Id);
         UpdateWindowBorder();
         _themeSettings.Changed += OnThemeSettingsChanged;
@@ -179,12 +195,12 @@ public sealed partial class MainWindow : Window
 
         var scale = GetWindowScale();
         var workArea = DisplayArea.GetFromWindowId(AppWindow.Id, DisplayAreaFallback.Primary).WorkArea;
-        var maximumWidth = Math.Max(1, Math.Min((int)(900 * scale), workArea.Width));
-        var maximumHeight = Math.Max(1, Math.Min((int)(900 * scale), workArea.Height));
-        var minimumWidth = Math.Min((int)(400 * scale), maximumWidth);
-        var minimumHeight = Math.Min((int)(600 * scale), maximumHeight);
+        var maximumWidth = Math.Max(1, Math.Min((int)(WindowWidth * scale), workArea.Width));
+        var maximumHeight = Math.Max(1, Math.Min((int)(WindowHeight * scale), workArea.Height));
+        var minimumWidth = maximumWidth;
+        var minimumHeight = maximumHeight;
         presenter.IsMaximizable = false;
-        presenter.IsResizable = true;
+        presenter.IsResizable = false;
 
         if (presenter.PreferredMaximumWidth == maximumWidth && presenter.PreferredMaximumHeight == maximumHeight
             && presenter.PreferredMinimumWidth == minimumWidth && presenter.PreferredMinimumHeight == minimumHeight)
@@ -321,27 +337,38 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private void OnReviewValidation(object sender, RoutedEventArgs args)
-    {
-        Control target = !string.IsNullOrEmpty(ViewModel.SpeedError) ? SpeedInput
-            : !string.IsNullOrEmpty(ViewModel.MouseError) ? MouseInput
-            : !string.IsNullOrEmpty(ViewModel.DelayError) ? DelayInput
-            : !string.IsNullOrEmpty(ViewModel.ClickLimitError) ? ClickLimitInput
-            : !string.IsNullOrEmpty(ViewModel.DurationLimitError) ? DurationInput : VariationInput;
-        if (ViewModel.HasAdvancedErrors && target != SpeedInput && target != MouseInput)
-            AdvancedOptions.IsExpanded = true;
-        DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
-        {
-            target.StartBringIntoView();
-            target.Focus(FocusState.Programmatic);
-        });
-    }
-
     private nint WindowNativeHandle() => WinRT.Interop.WindowNative.GetWindowHandle(this);
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct NativePoint
+    {
+        public int X;
+        public int Y;
+    }
 
     [DllImport("dwmapi.dll")]
     [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     private static extern int DwmSetWindowAttribute(nint window, uint attribute, in uint value, uint size);
+
+    [DllImport("comctl32.dll", SetLastError = true)]
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+    private static extern bool SetWindowSubclass(nint window, WindowMenuSubclassProcedure procedure, nuint subclassId, nuint referenceData);
+
+    [DllImport("comctl32.dll")]
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+    private static extern bool RemoveWindowSubclass(nint window, WindowMenuSubclassProcedure procedure, nuint subclassId);
+
+    [DllImport("comctl32.dll")]
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+    private static extern nint DefSubclassProc(nint window, uint message, nuint parameter, nint detail);
+
+    [DllImport("user32.dll")]
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+    private static extern bool GetCursorPos(out NativePoint point);
+
+    [DllImport("user32.dll")]
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+    private static extern bool ScreenToClient(nint window, ref NativePoint point);
 
     [DllImport("user32.dll", EntryPoint = "SendMessageW")]
     [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
@@ -485,13 +512,92 @@ public sealed partial class MainWindow : Window
         ViewModel.Refresh();
     }
 
-    private void OnTitleBarMinimize(object sender, RoutedEventArgs args)
+    private void OnTitleBarMinimize(object sender, RoutedEventArgs args) => MinimizeWindow();
+
+    private void MinimizeWindow()
     {
         if (!_closing && AppWindow.Presenter is OverlappedPresenter presenter)
             presenter.Minimize();
     }
 
+    private void BeginWindowMove()
+    {
+        if (_closing)
+            return;
+        DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low,
+            () => SendMessage(WindowNativeHandle(), 0x0112, 0xF012, 0));
+    }
+
     private void OnTitleBarClose(object sender, RoutedEventArgs args) => _ = CloseAsync();
+
+    private void InitializeWindowSystemMenu()
+    {
+        _windowMenuFlyout = new MenuFlyout();
+        var move = new MenuFlyoutItem { Text = _strings.Get("SystemMenuMove") };
+        move.Click += (_, _) => BeginWindowMove();
+        var minimize = new MenuFlyoutItem { Text = _strings.Get("SystemMenuMinimize") };
+        minimize.Click += (_, _) => MinimizeWindow();
+        var close = new MenuFlyoutItem { Text = _strings.Get("SystemMenuClose") };
+        close.Click += (_, _) => _ = CloseAsync();
+        _windowMenuFlyout.Items.Add(move);
+        _windowMenuFlyout.Items.Add(new MenuFlyoutSeparator());
+        _windowMenuFlyout.Items.Add(minimize);
+        _windowMenuFlyout.Items.Add(new MenuFlyoutSeparator());
+        _windowMenuFlyout.Items.Add(close);
+    }
+
+    private nint HandleWindowMenuMessage(nint window, uint message, nuint parameter, nint detail,
+        nuint subclassId, nuint referenceData)
+    {
+        if (!_closing)
+        {
+            if (message == 0x00A5 && parameter is 2 or 3) // WM_NCRBUTTONUP: caption or system icon.
+            {
+                if (TryGetClientCursorPosition(out var position) && QueueWindowSystemMenu(position))
+                    return 0;
+            }
+            else if (message == 0x0112) // WM_SYSCOMMAND
+            {
+                var command = (uint)(parameter & 0xFFF0);
+                var key = (uint)(detail.ToInt64() & 0xFFFF);
+                if (command == 0xF090 || (command == 0xF100 && key == 0x20)) // SC_MOUSEMENU / Alt+Space.
+                {
+                    var position = new Point(8, TitleBarDragRegion.ActualHeight);
+                    if (QueueWindowSystemMenu(position))
+                        return 0;
+                }
+            }
+        }
+
+        return DefSubclassProc(window, message, parameter, detail);
+    }
+
+    private bool TryGetClientCursorPosition(out Point position)
+    {
+        position = new Point(8, TitleBarDragRegion.ActualHeight);
+        var window = WindowNativeHandle();
+        if (!GetCursorPos(out var cursor) || !ScreenToClient(window, ref cursor))
+            return false;
+
+        var scale = Math.Max(96, GetDpiForWindow(window)) / 96.0;
+        position = new Point(cursor.X / scale, cursor.Y / scale);
+        return true;
+    }
+
+    private bool QueueWindowSystemMenu(Point position) =>
+        DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
+        {
+            if (!_closing && _windowMenuFlyout is { } menu && Root.XamlRoot is not null)
+            {
+                var minimumMenuY = TitleBarDragRegion.ActualHeight;
+                var menuPosition = new Point(position.X, Math.Max(position.Y, minimumMenuY));
+                menu.ShowAt(Root, new FlyoutShowOptions
+                {
+                    Position = menuPosition,
+                    Placement = FlyoutPlacementMode.Bottom
+                });
+            }
+        });
 
     private async void OnClosing(AppWindow sender, AppWindowClosingEventArgs args)
     {
@@ -529,6 +635,12 @@ public sealed partial class MainWindow : Window
         {
             _timer.Stop();
             _integration?.Dispose();
+            if (_windowMenuSubclassAttached)
+            {
+                RemoveWindowSubclass(WindowNativeHandle(), _windowMenuProcedure, 2);
+                _windowMenuSubclassAttached = false;
+            }
+            GC.KeepAlive(_windowMenuProcedure);
             _closeConfirmed = true;
             if (!DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, Close))
                 Close();
@@ -683,7 +795,8 @@ public sealed partial class MainWindow : Window
         {
             if (AppWindow.Presenter is not OverlappedPresenter presenter
                 || presenter.PreferredMaximumWidth is not { } maximumWidth
-                || presenter.PreferredMaximumHeight is not { } maximumHeight)
+                || presenter.PreferredMaximumHeight is not { } maximumHeight
+                || presenter.PreferredMinimumWidth != maximumWidth || presenter.PreferredMinimumHeight != maximumHeight)
                 return false;
 
             AdvancedOptions.IsExpanded = false;
@@ -717,8 +830,8 @@ public sealed partial class MainWindow : Window
                 CollapsedGap = collapsedGap, CollapsedBottomAligned = collapsedBottomAligned, ExpandedBottomAligned = expandedBottomAligned, CollapsedActionsVisible = collapsedActionsVisible,
                 ExpandedActionsVisible = expandedActionsVisible, RestoredFooterDelta = Math.Abs(restoredFooter - collapsedFooter) };
 
-            return !presenter.IsMaximizable && presenter.IsResizable
-                && boundedSize.Width <= maximumWidth && boundedSize.Height <= maximumHeight
+            return !presenter.IsMaximizable && !presenter.IsResizable
+                && boundedSize.Width == maximumWidth && boundedSize.Height == maximumHeight
                 && collapsedBottomAligned && expandedBottomAligned && IsFooterBottomAligned() && Math.Abs(restoredFooter - collapsedFooter) <= 1
                 && collapsedActionsVisible && expandedActionsVisible && AppWindow.Size.Equals(boundedSize);
         }
@@ -749,8 +862,8 @@ public sealed partial class MainWindow : Window
             foreach (var fontScale in new[] { 1.0, 1.5, 2.0 })
             {
                 ApplyFonts(fonts, fontScale);
-                foreach (var height in new[] { 600, 660, 740 })
-                foreach (var width in new[] { 400, 640, 800 })
+                foreach (var height in new[] { WindowHeight })
+                foreach (var width in new[] { WindowWidth })
                 foreach (var hasErrors in new[] { false, true })
                 {
                     ViewModel.ClicksPerSecond = hasErrors ? double.NaN : originalSpeed;
@@ -832,7 +945,7 @@ public sealed partial class MainWindow : Window
         var minimize = WindowMinimizeButton.TransformToVisual(AppTitleBar).TransformPoint(default);
         var close = WindowCloseButton.TransformToVisual(AppTitleBar).TransformPoint(default);
         var productName = TitleBarProductName.TransformToVisual(AppTitleBar).TransformPoint(default);
-        return AppWindow.Presenter is OverlappedPresenter { HasBorder: true, HasTitleBar: false, IsResizable: true, IsMaximizable: false }
+        return AppWindow.Presenter is OverlappedPresenter { HasBorder: true, HasTitleBar: false, IsResizable: false, IsMaximizable: false }
             && AppTitleBar.ActualHeight >= 32
             && !string.IsNullOrWhiteSpace(Microsoft.UI.Xaml.Automation.AutomationProperties.GetName(WindowMinimizeButton))
             && !string.IsNullOrWhiteSpace(Microsoft.UI.Xaml.Automation.AutomationProperties.GetName(WindowCloseButton))

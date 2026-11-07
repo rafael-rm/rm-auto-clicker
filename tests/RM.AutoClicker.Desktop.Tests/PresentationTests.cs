@@ -249,7 +249,7 @@ public sealed class PresentationTests
         Assert.Contains("30 s", viewModel.AdvancedSummary);
         Assert.Contains("20%", viewModel.AdvancedSummary);
         viewModel.InitialDelaySeconds = double.NaN;
-        Assert.Equal("Revisar opções", viewModel.AdvancedSummary);
+        Assert.Equal("Opções inválidas", viewModel.AdvancedSummary);
         viewModel.HasInitialDelay = false;
         Assert.DoesNotContain("Atraso", viewModel.AdvancedSummary);
     }

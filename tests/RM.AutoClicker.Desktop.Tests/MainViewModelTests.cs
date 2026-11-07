@@ -146,6 +146,81 @@ public sealed class MainViewModelTests
         Assert.Null(controller.LastPlan);
     }
 
+    [Theory]
+    [InlineData(-1, 0)]
+    [InlineData(-0.5, 0)]
+    [InlineData(0, 0)]
+    [InlineData(12.5, 12.5)]
+    [InlineData(50, 50)]
+    [InlineData(50.5, 50)]
+    [InlineData(80, 50)]
+    public async Task VariationInputClampsToItsRangeAndSavesTheAdjustedValue(double input, double expected)
+    {
+        var settings = new MemorySettings();
+        var model = CreateViewModel(settings);
+        model.VariationPercent = 20;
+
+        model.VariationPercent = input;
+
+        Assert.Equal(expected, model.VariationPercent);
+        Assert.Equal(expected, model.SliderVariationPercent);
+        Assert.Empty(model.VariationError);
+        Assert.True(model.StartCommand.CanExecute(null));
+        await model.SaveAsync();
+        Assert.Equal(expected, settings.LastSaved?.Plan?.VariationPercent);
+    }
+
+    [Theory]
+    [InlineData(-1, 0)]
+    [InlineData(12.5, 12.5)]
+    [InlineData(51, 50)]
+    public void VariationSliderClampsAndSynchronizesTheNumericField(double input, double expected)
+    {
+        var model = CreateViewModel();
+        model.VariationPercent = 20;
+
+        model.SliderVariationPercent = input;
+
+        Assert.Equal(expected, model.VariationPercent);
+        Assert.Equal(expected, model.SliderVariationPercent);
+    }
+
+    [Fact]
+    public void EmptyVariationPreservesTheSliderAndMovingItRestoresValidInput()
+    {
+        var model = CreateViewModel();
+        model.VariationPercent = 20;
+
+        model.VariationPercent = double.NaN;
+
+        Assert.True(double.IsNaN(model.VariationPercent));
+        Assert.Equal(20, model.SliderVariationPercent);
+        Assert.NotEmpty(model.VariationError);
+        Assert.False(model.StartCommand.CanExecute(null));
+        Assert.False(model.SaveCommand.CanExecute(null));
+
+        model.SliderVariationPercent = 35;
+
+        Assert.Equal(35, model.VariationPercent);
+        Assert.Empty(model.VariationError);
+        Assert.True(model.StartCommand.CanExecute(null));
+        Assert.True(model.SaveCommand.CanExecute(null));
+    }
+
+    [Theory]
+    [InlineData(double.NaN)]
+    [InlineData(double.PositiveInfinity)]
+    [InlineData(double.NegativeInfinity)]
+    public void VariationSliderIgnoresNonFiniteAssignments(double value)
+    {
+        var model = CreateViewModel();
+        model.VariationPercent = 20;
+
+        model.SliderVariationPercent = value;
+
+        Assert.Equal(20, model.VariationPercent);
+        Assert.Equal(20, model.SliderVariationPercent);
+    }
     private sealed class RecordingController : IClickSessionController
     {
         public ClickPlan? LastPlan { get; private set; }

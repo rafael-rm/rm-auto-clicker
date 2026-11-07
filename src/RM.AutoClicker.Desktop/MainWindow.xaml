@@ -19,6 +19,8 @@
                             <Setter Target="MouseInput.(Grid.Column)" Value="1" />
                             <Setter Target="MouseInput.(Grid.Row)" Value="0" />
                             <Setter Target="LimitSecondColumn.Width" Value="*" />
+                            <Setter Target="VariationSecondColumn.Width" Value="*" />
+                            <Setter Target="VariationControls.ColumnSpacing" Value="20" />
                             <Setter Target="DurationOptions.(Grid.Column)" Value="1" />
                             <Setter Target="DurationOptions.(Grid.Row)" Value="0" />
                             <Setter Target="SecondaryActions.(Grid.Column)" Value="1" />
@@ -197,8 +199,17 @@
 
                         <StackPanel Spacing="8">
                             <TextBlock x:Uid="RhythmTitle" Style="{ThemeResource BodyStrongTextBlockStyle}" />
-                            <controls:AutoDismissNumberBox x:Uid="Variation" x:Name="VariationInput" Value="{x:Bind ViewModel.VariationPercent, Mode=TwoWay}" Minimum="0" Maximum="50" SpinButtonPlacementMode="Compact" AutomationProperties.HelpText="{x:Bind ViewModel.VariationError, Mode=OneWay}" />
-                            <TextBlock Text="{x:Bind ViewModel.VariationError, Mode=OneWay}" Visibility="{x:Bind TextVisibility(ViewModel.VariationError), Mode=OneWay}" Foreground="{ThemeResource SystemFillColorCriticalBrush}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite" />
+                            <Grid x:Name="VariationControls" ColumnSpacing="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition x:Name="VariationSecondColumn" Width="0" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Spacing="8">
+                                    <controls:AutoDismissNumberBox x:Uid="Variation" x:Name="VariationInput" Value="{x:Bind ViewModel.VariationPercent, Mode=TwoWay}" Minimum="0" Maximum="50" SmallChange="1" ValidationMode="InvalidInputOverwritten" SpinButtonPlacementMode="Compact" AutomationProperties.HelpText="{x:Bind ViewModel.VariationError, Mode=OneWay}" />
+                                    <TextBlock Text="{x:Bind ViewModel.VariationError, Mode=OneWay}" Visibility="{x:Bind TextVisibility(ViewModel.VariationError), Mode=OneWay}" Foreground="{ThemeResource SystemFillColorCriticalBrush}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite" />
+                                    <Slider x:Uid="VariationSliderLabel" x:Name="VariationSlider" Minimum="0" Maximum="50" StepFrequency="0.5" Value="{x:Bind ViewModel.SliderVariationPercent, Mode=TwoWay}" />
+                                </StackPanel>
+                            </Grid>
                             <TextBlock x:Uid="VariationHint" TextWrapping="Wrap" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                         </StackPanel>
 
@@ -208,10 +219,6 @@
             </ScrollViewer>
             <StackPanel x:Name="OperationFooter" Grid.Row="2" Margin="0,6,0,0" Spacing="2" VerticalAlignment="Bottom">
                 <TextBlock x:Uid="PendingHint" Visibility="{x:Bind ToVisibility(ViewModel.ShowPendingChanges), Mode=OneWay}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite" />
-                <Grid Visibility="{x:Bind ToVisibility(ViewModel.HasValidationError), Mode=OneWay}" ColumnSpacing="12">
-                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                    <Button x:Uid="Review" Grid.Column="1" Click="OnReviewValidation" AutomationProperties.HelpText="{x:Bind ViewModel.ValidationMessage, Mode=OneWay}" />
-                </Grid>
                 <TextBlock Text="{x:Bind ViewModel.StartBlocker, Mode=OneWay}" Visibility="{x:Bind ToVisibility(ViewModel.ShowStartBlocker), Mode=OneWay}" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                 <Grid ColumnSpacing="12">
                     <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>

@@ -2,6 +2,9 @@
 <root>
   <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
   <resheader name="version"><value>2.0</value></resheader>
+  <data name="SystemMenuMove" xml:space="preserve"><value>Move</value></data>
+  <data name="SystemMenuMinimize" xml:space="preserve"><value>Minimize</value></data>
+  <data name="SystemMenuClose" xml:space="preserve"><value>Close</value></data>
   <data name="WindowMinimize.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Minimize window</value></data>
   <data name="WindowMinimize.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve"><value>Minimizes the window. Its destination depends on the tray preference.</value></data>
   <data name="WindowClose.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Close RM Auto Clicker</value></data>
@@ -55,7 +58,6 @@
   <data name="Variation.Header" xml:space="preserve"><value>Interval variation (%)</value></data>
   <data name="VariationHint.Text" xml:space="preserve"><value>Varies the time between clicks. 0% keeps a fixed interval.</value></data>
   <data name="PendingHint.Text" xml:space="preserve"><value>Changes apply to the next session.</value></data>
-  <data name="Review.Content" xml:space="preserve"><value>Review</value></data>
   <data name="Start.Content" xml:space="preserve"><value>Start</value></data>
   <data name="Stop.Content" xml:space="preserve"><value>Stop</value></data>
   <data name="Save.Content" xml:space="preserve"><value>Save</value></data>
@@ -72,7 +74,7 @@
   <data name="EmergencyUnavailable" xml:space="preserve"><value>Emergency unavailable</value></data>
   <data name="StopBeforeHotkey" xml:space="preserve"><value>Stop the session to change the shortcut.</value></data>
   <data name="SimpleKeyWarning" xml:space="preserve"><value>Single keys may interfere with typing in other applications.</value></data>
-  <data name="ReviewOptions" xml:space="preserve"><value>Review options</value></data>
+  <data name="InvalidOptions" xml:space="preserve"><value>Invalid options</value></data>
   <data name="SpeedError" xml:space="preserve"><value>Enter a speed from 1 to 100 clicks/s.</value></data>
   <data name="MouseError" xml:space="preserve"><value>Select a mouse button.</value></data>
   <data name="DelayError" xml:space="preserve"><value>Enter a delay from {0} to 300 seconds.</value></data>
@@ -81,7 +83,7 @@
   <data name="VariationError" xml:space="preserve"><value>Enter a variation from 0 to 50%.</value></data>
   <data name="ShuttingDown" xml:space="preserve"><value>Shutting down…</value></data>
   <data name="ConfirmHotkey" xml:space="preserve"><value>Apply or cancel the shortcut.</value></data>
-  <data name="ReviewBeforeStart" xml:space="preserve"><value>Review the highlighted fields before starting.</value></data>
+  <data name="InvalidFields" xml:space="preserve"><value>Correct the highlighted fields to start.</value></data>
   <data name="CheckHotkeys" xml:space="preserve"><value>Check the shortcuts.</value></data>
   <data name="FinishingPrevious" xml:space="preserve"><value>Finishing the previous session…</value></data>
   <data name="Interval" xml:space="preserve"><value>Interval: {0:0.##} ms</value></data>
@@ -102,7 +104,7 @@
   <data name="StartFailed" xml:space="preserve"><value>Could not start. Check the settings and try again.</value></data>
   <data name="StopFailed" xml:space="preserve"><value>Could not finish stopping. Exit the application.</value></data>
   <data name="SaveFailed" xml:space="preserve"><value>Could not save. Try again.</value></data>
-  <data name="InvalidSettings" xml:space="preserve"><value>Review the settings before continuing.</value></data>
+  <data name="InvalidSettings" xml:space="preserve"><value>Check the settings before continuing.</value></data>
   <data name="CaptureHint" xml:space="preserve"><value>Press a key or combination. Esc cancels.</value></data>
   <data name="HotkeyRegisterFailed" xml:space="preserve"><value>Could not register this combination. The previous shortcut was preserved.</value></data>
   <data name="HotkeyProtected" xml:space="preserve"><value>The shortcut applies until you close the app. The preferences file is protected.</value></data>
@@ -149,7 +151,6 @@
   <data name="TrayExit" xml:space="preserve"><value>Exit</value></data>
   <data name="SmokeLongNotice" xml:space="preserve"><value>Could not save preferences. Changes remain available for this session. Check the file before trying again; the session was not started and the previous settings were preserved.</value></data>
   <data name="LanguagePending" xml:space="preserve"><value>Restart to apply the language.</value></data>
-  <data name="Review.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Review fields</value></data>
   <data name="LimitsHint.Text" xml:space="preserve"><value>Stops when the first limit is reached.</value></data>
   <data name="LanguagePendingActive" xml:space="preserve"><value>Restart to apply the language. The current session will end.</value></data>
   <data name="TrayPreferenceSaveFailed" xml:space="preserve"><value>Could not save. Try again. The tray option was restored to its saved value.</value></data>
@@ -157,4 +158,5 @@
   <data name="Variation.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve"><value>At 20%, a 100 ms interval varies from 80 to 120 ms. The observed rate depends on the system.</value></data>
   <data name="LanguagePicker.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve"><value>Number formats follow the Windows region.</value></data>
   <data name="AdvancedDescription" xml:space="preserve"><value>Countdown, limits and interval variation</value></data>
+  <data name="VariationSliderLabel.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Adjust interval variation from 0 to 50 percent</value></data>
 </root>

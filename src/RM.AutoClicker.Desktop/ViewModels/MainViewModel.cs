@@ -28,6 +28,7 @@ public partial class MainViewModel : ObservableObject
     private readonly SemaphoreSlim _preferencesGate = new(1, 1);
     private Task _minimizeToTraySaveTask = Task.CompletedTask;
     private double _sliderClicksPerSecond = 10;
+    private double _sliderVariationPercent;
     private ClickPlan? _activePlan;
     private string _noticeOrigin = string.Empty;
     private SessionFailure? _reportedFailure;
@@ -188,6 +189,16 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    public double SliderVariationPercent
+    {
+        get => _sliderVariationPercent;
+        set
+        {
+            if (double.IsFinite(value))
+                VariationPercent = Math.Clamp(value, 0, 50);
+        }
+    }
+
     public bool HasMessage => !string.IsNullOrWhiteSpace(Message);
     public bool HasHotkeyStatusWarning => _integration?.HasStatusWarning ?? true;
     public bool CanEditHotkey => !_shuttingDown && !_restarting && Snapshot.State is SessionState.Idle or SessionState.Faulted;
@@ -205,7 +216,7 @@ public partial class MainViewModel : ObservableObject
     public string HotkeyEditHint => !CanEditHotkey ? _strings.Get("StopBeforeHotkey")
         : HasHotkeyDraft && PendingHotkey is { Modifiers: HotkeyModifiers.None } ? _strings.Get("SimpleKeyWarning") : string.Empty;
     public bool HasHotkeyEditHint => !string.IsNullOrEmpty(HotkeyEditHint);
-    public string AdvancedSummary => HasAdvancedErrors ? _strings.Get("ReviewOptions") : DescribeAdvancedPlan();
+    public string AdvancedSummary => HasAdvancedErrors ? _strings.Get("InvalidOptions") : DescribeAdvancedPlan();
     public bool HasValidationError => !string.IsNullOrEmpty(ValidationMessage);
     public bool HasAdvancedErrors => !string.IsNullOrEmpty(DelayError + ClickLimitError + DurationLimitError + VariationError);
     public bool ShowBothLimitsHint => HasClickLimit && HasDurationLimit;
@@ -219,7 +230,7 @@ public partial class MainViewModel : ObservableObject
         : _restarting ? _strings.Get("Restarting")
         : IsSessionActive ? string.Empty
         : HasHotkeyDraft ? _strings.Get("ConfirmHotkey")
-        : HasValidationError ? _strings.Get("ReviewBeforeStart")
+        : HasValidationError ? _strings.Get("InvalidFields")
         : _integration?.HotkeysReady != true ? _strings.Get("CheckHotkeys")
         : !_controller.Completion.IsCompleted ? _strings.Get("FinishingPrevious")
         : string.Empty;
@@ -504,6 +515,25 @@ public partial class MainViewModel : ObservableObject
         {
             _sliderClicksPerSecond = value;
             OnPropertyChanged(nameof(SliderClicksPerSecond));
+        }
+    }
+
+    partial void OnVariationPercentChanged(double value)
+    {
+        if (!double.IsFinite(value))
+            return;
+
+        var adjusted = Math.Clamp(value, 0, 50);
+        if (adjusted != value)
+        {
+            VariationPercent = adjusted;
+            return;
+        }
+
+        if (_sliderVariationPercent != value)
+        {
+            _sliderVariationPercent = value;
+            OnPropertyChanged(nameof(SliderVariationPercent));
         }
     }
 

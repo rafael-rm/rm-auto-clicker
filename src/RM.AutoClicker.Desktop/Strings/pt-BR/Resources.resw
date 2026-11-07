@@ -2,6 +2,9 @@
 <root>
   <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
   <resheader name="version"><value>2.0</value></resheader>
+  <data name="SystemMenuMove" xml:space="preserve"><value>Mover</value></data>
+  <data name="SystemMenuMinimize" xml:space="preserve"><value>Minimizar</value></data>
+  <data name="SystemMenuClose" xml:space="preserve"><value>Fechar</value></data>
   <data name="WindowMinimize.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Minimizar janela</value></data>
   <data name="WindowMinimize.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve"><value>Minimiza a janela. O destino depende da preferência de bandeja.</value></data>
   <data name="WindowClose.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Fechar RM Auto Clicker</value></data>
@@ -55,7 +58,6 @@
   <data name="Variation.Header" xml:space="preserve"><value>Variação do intervalo (%)</value></data>
   <data name="VariationHint.Text" xml:space="preserve"><value>Varia o tempo entre cliques. 0% mantém o intervalo fixo.</value></data>
   <data name="PendingHint.Text" xml:space="preserve"><value>Alterações na próxima sessão.</value></data>
-  <data name="Review.Content" xml:space="preserve"><value>Revisar</value></data>
   <data name="Start.Content" xml:space="preserve"><value>Iniciar</value></data>
   <data name="Stop.Content" xml:space="preserve"><value>Parar</value></data>
   <data name="Save.Content" xml:space="preserve"><value>Salvar</value></data>
@@ -72,7 +74,7 @@
   <data name="EmergencyUnavailable" xml:space="preserve"><value>Emergência indisponível</value></data>
   <data name="StopBeforeHotkey" xml:space="preserve"><value>Pare a sessão para alterar o atalho.</value></data>
   <data name="SimpleKeyWarning" xml:space="preserve"><value>Teclas simples podem interferir na digitação de outros aplicativos.</value></data>
-  <data name="ReviewOptions" xml:space="preserve"><value>Revisar opções</value></data>
+  <data name="InvalidOptions" xml:space="preserve"><value>Opções inválidas</value></data>
   <data name="SpeedError" xml:space="preserve"><value>Informe uma velocidade entre 1 e 100 cliques/s.</value></data>
   <data name="MouseError" xml:space="preserve"><value>Selecione um botão do mouse.</value></data>
   <data name="DelayError" xml:space="preserve"><value>Informe um atraso entre {0} e 300 segundos.</value></data>
@@ -81,7 +83,7 @@
   <data name="VariationError" xml:space="preserve"><value>Informe uma variação entre 0 e 50%.</value></data>
   <data name="ShuttingDown" xml:space="preserve"><value>Encerrando…</value></data>
   <data name="ConfirmHotkey" xml:space="preserve"><value>Aplique ou cancele o atalho.</value></data>
-  <data name="ReviewBeforeStart" xml:space="preserve"><value>Revise os campos destacados antes de iniciar.</value></data>
+  <data name="InvalidFields" xml:space="preserve"><value>Corrija os campos destacados para iniciar.</value></data>
   <data name="CheckHotkeys" xml:space="preserve"><value>Verifique os atalhos.</value></data>
   <data name="FinishingPrevious" xml:space="preserve"><value>Finalizando a sessão anterior…</value></data>
   <data name="Interval" xml:space="preserve"><value>Intervalo: {0:0.##} ms</value></data>
@@ -102,7 +104,7 @@
   <data name="StartFailed" xml:space="preserve"><value>Não foi possível iniciar. Verifique as configurações e tente novamente.</value></data>
   <data name="StopFailed" xml:space="preserve"><value>Não foi possível concluir a parada. Encerre o aplicativo.</value></data>
   <data name="SaveFailed" xml:space="preserve"><value>Não foi possível salvar. Tente novamente.</value></data>
-  <data name="InvalidSettings" xml:space="preserve"><value>Revise as configurações antes de continuar.</value></data>
+  <data name="InvalidSettings" xml:space="preserve"><value>Verifique as configurações antes de continuar.</value></data>
   <data name="CaptureHint" xml:space="preserve"><value>Pressione uma tecla ou combinação. Esc cancela.</value></data>
   <data name="HotkeyRegisterFailed" xml:space="preserve"><value>Não foi possível registrar essa combinação. O atalho anterior foi preservado.</value></data>
   <data name="HotkeyProtected" xml:space="preserve"><value>O atalho vale até fechar o aplicativo. O arquivo de preferências está protegido.</value></data>
@@ -149,7 +151,6 @@
   <data name="TrayExit" xml:space="preserve"><value>Sair</value></data>
   <data name="SmokeLongNotice" xml:space="preserve"><value>Não foi possível salvar as preferências. As alterações continuam disponíveis nesta execução. Verifique o arquivo antes de tentar novamente; a execução não foi iniciada e as configurações anteriores foram preservadas.</value></data>
   <data name="LanguagePending" xml:space="preserve"><value>Reinicie para aplicar o idioma.</value></data>
-  <data name="Review.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Revisar campos</value></data>
   <data name="LimitsHint.Text" xml:space="preserve"><value>Para ao atingir o primeiro limite.</value></data>
   <data name="LanguagePendingActive" xml:space="preserve"><value>Reinicie para aplicar o idioma. A sessão atual será encerrada.</value></data>
   <data name="TrayPreferenceSaveFailed" xml:space="preserve"><value>Não foi possível salvar. Tente novamente. A opção de bandeja voltou ao valor salvo.</value></data>
@@ -157,4 +158,5 @@
   <data name="Variation.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve"><value>Com 20%, um intervalo de 100 ms varia entre 80 e 120 ms. A taxa observada depende do sistema.</value></data>
   <data name="LanguagePicker.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve"><value>Os formatos numéricos seguem a região do Windows.</value></data>
   <data name="AdvancedDescription" xml:space="preserve"><value>Contagem regressiva, limites e variação</value></data>
+  <data name="VariationSliderLabel.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Ajustar variação do intervalo de 0 a 50 por cento</value></data>
 </root>

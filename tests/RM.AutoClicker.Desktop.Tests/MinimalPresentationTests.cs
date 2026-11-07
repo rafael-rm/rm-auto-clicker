@@ -140,7 +140,7 @@ public sealed class MinimalPresentationTests
         Assert.Equal(configured, model.AdvancedSummary);
 
         model.MaximumClicks = double.NaN;
-        Assert.Equal(strings.Get("ReviewOptions"), model.AdvancedSummary);
+        Assert.Equal(strings.Get("InvalidOptions"), model.AdvancedSummary);
 
         model.HasClickLimit = false;
         Assert.Equal(strings.Get("AdvancedDescription"), model.AdvancedSummary);
