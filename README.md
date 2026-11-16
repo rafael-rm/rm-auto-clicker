@@ -1,50 +1,50 @@
-<img src="assets/branding/rm-auto-clicker-logo.png" alt="Logo do RM Auto Clicker" width="80">
+<img src="assets/branding/rm-auto-clicker-logo.png" alt="RM Auto Clicker logo" width="80">
 
 # RM Auto Clicker
 
-Automatize cliques no Windows com velocidade ajustável, atalhos personalizáveis e uma interface simples.
+Automate clicks on Windows with adjustable speed, customizable hotkeys, and a simple interface.
 
-## Como usar
+## How to use
 
-1. Na seção **Releases** do repositório, baixe o arquivo `RMAutoClicker-<versão>-win-x64.exe`.
-2. Abra o aplicativo e escolha a velocidade e o botão do mouse.
-3. Posicione o cursor onde deseja clicar e pressione **F8** para iniciar.
-4. Pressione **F8** novamente para parar.
+1. Download `RMAutoClicker-<version>-win-x64.exe` from the repository's **Releases** section.
+2. Open the app and choose the speed and mouse button.
+3. Move the cursor to where you want to click and press **F8** to start.
+4. Press **F8** again to stop.
 
-Também é possível usar os botões **Iniciar** e **Parar**. A parada de emergência é **Ctrl+Shift+F10**.
+You can also use the **Start** and **Stop** buttons. The emergency stop shortcut is **Ctrl+Shift+F10**.
 
-O aplicativo é distribuído em um único EXE para **Windows 10 ou 11 de 64 bits (x64)**. Não precisa de instalação nem do .NET instalado separadamente.
+The app is distributed as a single EXE for **64-bit (x64) Windows 10 or 11**. No installation is required, and .NET does not need to be installed separately.
 
-## Recursos
+## Features
 
-- Velocidade de **1 a 100 cliques por segundo**.
-- Clique com o botão esquerdo, direito ou do meio.
-- Atalho de iniciar/parar personalizável, com combinações de Ctrl, Alt e Shift.
-- Opções avançadas de atraso inicial, limite de cliques, limite de tempo e variação do intervalo.
-- Contadores de cliques e tempo da sessão.
-- Temas claro, escuro e do sistema.
-- Interface em português, inglês e espanhol.
+- Speed from **1 to 100 clicks per second**.
+- Left, right, or middle mouse button.
+- Customizable start/stop shortcut with Ctrl, Alt, and Shift combinations.
+- Advanced options for initial delay, click limit, time limit, and interval variation.
+- Click count and session time counters.
+- Light, dark, and system themes.
+- Available in Portuguese, English, and Spanish.
 
-O atraso inicial vem desativado. Os cliques são suspensos enquanto o cursor estiver sobre a janela do próprio aplicativo e retomados ao sair dela.
+The initial delay is off by default. Clicking is paused while the cursor is over the app's own window and resumes when the cursor leaves the window.
 
-## Preferências e bandeja
+## Preferences and system tray
 
-Em **Preferências**, escolha o tema e o idioma. Depois de trocar o idioma, use **Reiniciar agora** para aplicá-lo. A opção **Minimizar para a bandeja** fica desativada por padrão e é salva ao selecioná-la.
+Under **Preferences**, choose a theme and language. After changing the language, select **Restart now** to apply it. **Minimize to the system tray** is off by default, and the setting is saved when you select it.
 
-Para mudar o atalho, clique em **Alterar atalho**, pressione a combinação desejada e confirme em **Aplicar atalho**. Se a combinação estiver indisponível, o atalho anterior continua valendo.
+To change the shortcut, select **Change shortcut**, press the desired key combination, and confirm with **Apply shortcut**. If the combination is unavailable, the previous shortcut remains active.
 
-Por padrão, minimizar mantém a janela na barra de tarefas. Ative **Minimizar para a bandeja** para ocultá-la da barra e deixá-la na área de notificação; para reabrir, dê dois cliques no ícone próximo ao relógio ou escolha **Abrir** no menu do ícone. Fechar a janela encerra o aplicativo e os cliques.
+By default, minimizing keeps the window on the taskbar. Enable **Minimize to the system tray** to hide the window from the taskbar and place its icon in the notification area. To reopen the app, double-click the icon near the clock or select **Open** from its menu. Closing the window exits the app and stops clicking.
 
-## Configurações e logs
+## Settings and logs
 
-Os arquivos ficam em:
+Files are stored in:
 
 ```text
 %LOCALAPPDATA%\RM Corporation\RM Auto Clicker\
 ```
 
-As preferências são salvas em `settings.json` e os logs ficam em `logs`.
+Preferences are saved in `settings.json`, and logs are stored in `logs`.
 
-## Documentação técnica
+## Technical documentation
 
-Para compilar, testar ou contribuir com o projeto, consulte o [guia técnico](docs/technical.md).
+For instructions on building, testing, or contributing to the project, see the [technical guide](docs/technical.md) (in Portuguese).
