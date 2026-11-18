@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <TargetFramework>net11.0-windows10.0.19041.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <AssemblyName>RMAutoClicker-$(Version)-win-x64</AssemblyName>
     <RootNamespace>RM.AutoClicker.Desktop</RootNamespace>
@@ -20,6 +20,8 @@
     <PublishSingleFile>true</PublishSingleFile>
     <EnableCompressionInSingleFile Condition="'$(Configuration)' == 'Release'">true</EnableCompressionInSingleFile>
     <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+    <!-- WinUI single-file deployment requires disk extraction for DLL SxS redirection. -->
+    <NoWarn>$(NoWarn);NETSDK1244</NoWarn>
     <WindowsAppSDKSingleFileVerifyConfiguration>true</WindowsAppSDKSingleFileVerifyConfiguration>
     <PublishTrimmed>false</PublishTrimmed>
     <PublishAot>false</PublishAot>
