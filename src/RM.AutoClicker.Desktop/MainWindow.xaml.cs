@@ -79,7 +79,7 @@ public sealed partial class MainWindow : Window
             numberCulture = "en-US";
         var numberRegion = new RegionInfo(numberCulture).TwoLetterISORegionName;
         foreach (var input in new[] { SpeedInput, DelayInput, ClickLimitInput, DurationInput, VariationInput })
-            input.NumberFormatter = new Windows.Globalization.NumberFormatting.DecimalFormatter([numberCulture], numberRegion) { FractionDigits = 0 };
+            input.NumberFormatter = new Windows.Globalization.NumberFormatting.DecimalFormatter(new[] { numberCulture }, numberRegion) { FractionDigits = 0 };
         ConfigureWindowBounds();
         var scale = GetWindowScale();
         var workArea = DisplayArea.GetFromWindowId(AppWindow.Id, DisplayAreaFallback.Primary).WorkArea;

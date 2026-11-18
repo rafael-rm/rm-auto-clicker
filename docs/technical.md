@@ -6,18 +6,18 @@ Referência da implementação atual. Para instruções de uso, consulte o [READ
 
 | Item | Configuração |
 | --- | --- |
-| SDK .NET | `10.0.403`, fixado em [global.json](../global.json) |
+| SDK .NET | `11.0.100`, fixado em [global.json](../global.json) |
 | Resolução do SDK | `rollForward: disable`; previews desabilitadas |
-| Runtime de referência do pacote | `.NET 10.0.14` |
-| Interface | WinUI 3 / Windows App SDK `2.5.1` |
+| Runtime de referência do pacote | `.NET 11.0.0` |
+| Interface | WinUI 3 / Windows App SDK `2.6.5` |
 | MVVM | CommunityToolkit.Mvvm `8.4.2` |
-| Desktop | `net10.0-windows10.0.19041.0`, `win-x64` |
+| Desktop | `net11.0-windows10.0.19041.0`, `win-x64` |
 | Plataforma mínima declarada no Desktop | `10.0.17763.0` |
 | Scripts | PowerShell 7 no Windows |
 | Solução | [RM.AutoClicker.slnx](../RM.AutoClicker.slnx) |
 | Versão do produto | `1.1.0`, definida em [Directory.Build.props](../Directory.Build.props) |
 
-Os pacotes diretos estão em [Directory.Packages.props](../Directory.Packages.props). Cada projeto mantém seu `packages.lock.json`. A primeira restauração requer acesso aos feeds NuGet; as compilações e os testes da solução devem ser executados no Windows.
+As versões dos pacotes estão em [Directory.Packages.props](../Directory.Packages.props), incluindo dependências transitivas atualizadas com `CentralPackageTransitivePinningEnabled`. Esse pinning só afeta pacotes já presentes no grafo de dependências. Cada projeto mantém seu `packages.lock.json`. A primeira restauração requer acesso aos feeds NuGet; as compilações e os testes da solução devem ser executados no Windows.
 
 ### Compilar e testar
 
@@ -40,7 +40,7 @@ dotnet restore RM.AutoClicker.slnx --force-evaluate
 dotnet restore RM.AutoClicker.slnx --locked-mode
 ```
 
-Revise os lockfiles e execute build e testes antes de incluí-los na mesma alteração. O modo travado impede que o CI aceite silenciosamente outro grafo de dependências. O SDK permanece fixado, inclusive para novas feature bands do .NET 10.0; atualizações passam por revisão.
+Revise os lockfiles e execute build e testes antes de incluí-los na mesma alteração. O modo travado impede que o CI aceite silenciosamente outro grafo de dependências. O SDK permanece fixado, inclusive para novas feature bands do .NET 11.0; atualizações passam por revisão.
 
 ## Organização e dependências
 
@@ -237,7 +237,7 @@ O script usa System.Drawing no Windows para criar [rm-auto-clicker.ico](../asset
 | `tests/scripts/` | Versões, conteúdo/hash do pacote, vínculo da tag ao commit e orquestração da publicação com Git/`gh` simulados |
 | `Test-Smoke.ps1` | Inicialização e recursos do EXE isolado, runtime privado, ícones, comportamento de controles e layout |
 
-Os testes Desktop vinculam arquivos-fonte reais do aplicativo no projeto de testes `net10.0`; não carregam WinUI para exercitar o ViewModel. A verificação dos controles WinUI reais pertence ao smoke.
+Os testes Desktop vinculam arquivos-fonte reais do aplicativo no projeto de testes `net11.0`; não carregam WinUI para exercitar o ViewModel. A verificação dos controles WinUI reais pertence ao smoke.
 
 Os testes automatizados padrão não injetam cliques no desktop. Após gerar o EXE, execute explicitamente o smoke local:
 
@@ -271,6 +271,8 @@ $release = ./scripts/Get-Version.ps1
 ```
 
 O publish faz restore travado e gera um EXE x64 autossuficiente e comprimido em Release. `PublishTrimmed` e `PublishAot` estão desabilitados. `IncludeAllContentForSelfExtract` inclui conteúdo e dependências na extração interna, inclusive o ícone. O diretório do EXE não precisa receber arquivos auxiliares.
+
+O Windows App SDK exige `IncludeAllContentForSelfExtract=true` para o redirecionamento SxS de DLLs no EXE único. O projeto Desktop suprime apenas o aviso `NETSDK1244`, introduzido no SDK .NET 11 para esse modo de extração; a validação `WindowsAppSDKSingleFileVerifyConfiguration` permanece habilitada.
 
 | Saída | Conteúdo |
 | --- | --- |
@@ -337,7 +339,7 @@ Esses comandos são um procedimento de publicação, não parte do build local. 
 
 Os símbolos não são anexados às GitHub Releases. Para investigar versões por mais tempo, o mantenedor precisa preservar os PDBs correspondentes.
 
-[Dependabot](../.github/dependabot.yml) verifica semanalmente SDK, GitHub Actions e NuGet, sem auto-merge. O SDK tem limite de um PR e ignora avanços de major/minor; aceita revisão de atualizações dentro do .NET 10.0. Actions são agrupadas; NuGet agrupa atualizações minor/patch.
+[Dependabot](../.github/dependabot.yml) verifica semanalmente SDK, GitHub Actions e NuGet, sem auto-merge. O SDK tem limite de um PR e ignora avanços de major/minor; aceita revisão de atualizações dentro do .NET 11.0. Actions são agrupadas; NuGet agrupa atualizações minor/patch.
 
 Os jobs de atualização do Dependabot têm seleção de runner própria. Para este projeto, o runner padrão do GitHub é suficiente; um `Labeled runner` depende de infraestrutura compatível disponível e pode deixar jobs aguardando na fila.
 
